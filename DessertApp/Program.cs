@@ -2,6 +2,7 @@ using DessertApp.Models;
 using DessertApp.Models.Data;
 using DessertApp.Services;
 using DessertApp.Services.EmailServices;
+using DessertApp.Services.RoleStoreServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -13,12 +14,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-
+//Add SQLServer database to project
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLString"));
 });
-
 
 //Add identity services to project
 builder.Services.AddIdentity<AppUser, AppRole>(options =>
@@ -28,11 +28,12 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+
 builder.Services.AddRazorPages();
 
 //Identity Services
-builder.Services.AddTransient<IUserStore<AppUser>, AppUserStore>();
-builder.Services.AddTransient<IRoleStore<AppRole>, AppRoleStore>();
+builder.Services.AddScoped<IUserStore<AppUser>, AppUserStore>();
+builder.Services.AddScoped<IExtendedRoleStore<AppRole>, AppRoleStore>();
 
 //Send Email services
 builder.Services.AddTransient<IMailjetClient>(provider =>
@@ -52,7 +53,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var serviceProvider = scope.ServiceProvider;
-    await RoleInitializer.SeedRolesAsync(serviceProvider);
+    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+    await DataInitializer.SeedRolesAsync(serviceProvider);
+    await DataInitializer.SeedAdminUserAsync(serviceProvider, configuration["AdminUserCredentials:AdminEmail"]!);
 }
 
 // Configure the HTTP request pipeline.

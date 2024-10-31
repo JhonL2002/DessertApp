@@ -1,5 +1,6 @@
 ﻿using DessertApp.Models;
 using DessertApp.Models.Data;
+using DessertApp.Services.RoleStoreServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DessertApp.Services
 {
-    public class AppRoleStore : IRoleStore<AppRole>
+    public class AppRoleStore : IExtendedRoleStore<AppRole>
     {
         private readonly AppDbContext _context;
         //private bool _disposed = false;
@@ -89,6 +90,11 @@ namespace DessertApp.Services
             _context.Roles.Update(role);
             await _context.SaveChangesAsync(cancellationToken);
             return IdentityResult.Success;
+        }
+
+        public async Task<IEnumerable<AppRole>> GetAllRolesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.Roles.ToListAsync(cancellationToken);
         }
     }
 }

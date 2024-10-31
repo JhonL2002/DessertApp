@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DessertApp.Services
 {
-    public class AppUserStore : IUserStore<AppUser>, IUserEmailStore<AppUser>, IUserPasswordStore<AppUser>
+    public class AppUserStore : IUserStore<AppUser>, IUserEmailStore<AppUser>, IUserPasswordStore<AppUser>, IUserRoleStore<AppUser>
     {
         private readonly AppDbContext _context;
         //private bool _disposed = false;
@@ -191,6 +191,68 @@ namespace DessertApp.Services
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             return Task.FromResult(user.PasswordHash != null);
+        }
+
+        public async Task AddToRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
+        {
+            var role = await _context.Roles.SingleOrDefaultAsync(r => r.Name == roleName, cancellationToken);
+            if (role == null) throw new InvalidOperationException("Role not found.");
+
+            var userRole = new IdentityUserRole<string>
+            {
+                UserId = user.Id,
+                RoleId = role.Id
+            };
+
+            await _context.UserRoles.AddAsync(userRole, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task RemoveFromRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
+        {
+            var userRole = await _context.UserRoles
+            .SingleOrDefaultAsync(ur => ur.UserId == user.Id && ur.RoleId == roleName, cancellationToken);
+
+            if (userRole != null)
+            {
+                _context.UserRoles.Remove(userRole);
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+        }
+
+        public async Task<IList<string>> GetRolesAsync(AppUser user, CancellationToken cancellationToken)
+        {
+            var roles =  await _context.UserRoles
+                .Where(ur => ur.UserId == user.Id)
+                .Join(_context.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => r.Name)
+                .ToListAsync(cancellationToken);
+
+            return roles!;
+        }
+
+        public async Task<bool> IsInRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
+        {
+            return await _context.UserRoles
+                .Join(_context.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => new { ur, r })
+                .AnyAsync(userRole => userRole.ur.UserId == user.Id && userRole.r.Name == roleName, cancellationToken);
+        }
+
+        public async Task<IList<AppUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        {
+            return (IList<AppUser>)await _context.UserRoles
+                .Join(_context.Roles,
+                    ur => ur.RoleId,
+                    r => r.Id,
+                    (ur, r) => new { ur, r })
+                .Where(ur => ur.r.Name == roleName)
+                .Select(userRole => userRole.ur.UserId)
+                .ToListAsync(cancellationToken);
         }
     }
 }
