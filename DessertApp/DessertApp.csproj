@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>9fdfe158-387a-4d48-92ce-01c4a59c2196</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,10 +23,6 @@
   <ItemGroup>
     <ProjectReference Include="..\DessertApp.Models\DessertApp.Models.csproj" />
     <ProjectReference Include="..\DessertApp.Services\DessertApp.Services.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Areas\Identity\Data\" />
   </ItemGroup>
 
 </Project>

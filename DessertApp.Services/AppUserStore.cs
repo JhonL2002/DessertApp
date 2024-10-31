@@ -18,13 +18,10 @@ namespace DessertApp.Services
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            // Agrega el usuario al contexto
             _context.Users.Add(user);
 
-            // Guarda los cambios en la base de datos
             var result = await _context.SaveChangesAsync(cancellationToken);
 
-            // Devuelve un resultado exitoso si el usuario fue agregado correctamente
             return result > 0 ? IdentityResult.Success : IdentityResult.Failed(new IdentityError { Description = "Failed to create user." });
         }
 
@@ -32,13 +29,10 @@ namespace DessertApp.Services
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            // Elimina el usuario del contexto
             _context.Users.Remove(user);
 
-            // Guarda los cambios en la base de datos
             var result = await _context.SaveChangesAsync(cancellationToken);
 
-            // Devuelve un resultado exitoso si el usuario fue eliminado correctamente
             return result > 0 ? IdentityResult.Success : IdentityResult.Failed(new IdentityError { Description = "Failed to delete user." });
         }
 
@@ -56,9 +50,10 @@ namespace DessertApp.Services
             }
         }
 
-        public Task<AppUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        public async Task<AppUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _context.Users
+               .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
         }
 
         public async Task<AppUser?> FindByIdAsync(string userId, CancellationToken cancellationToken)
@@ -86,7 +81,6 @@ namespace DessertApp.Services
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            // Devuelve si el correo del usuario está confirmado
             return Task.FromResult(user.EmailConfirmed);
         }
 
@@ -94,7 +88,6 @@ namespace DessertApp.Services
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            // Devuelve el correo electrónico normalizado
             return Task.FromResult(user.NormalizedEmail);
         }
 
@@ -102,7 +95,6 @@ namespace DessertApp.Services
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            // Devuelve el nombre de usuario normalizado
             return Task.FromResult(user.NormalizedUserName);
         }
 
@@ -110,7 +102,6 @@ namespace DessertApp.Services
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
-            // Devuelve el ID del usuario
             return Task.FromResult(user.Id);
         }
 
@@ -155,7 +146,6 @@ namespace DessertApp.Services
 
             user.UserName = userName;
 
-            // Si estás trabajando con Entity Framework y deseas persistir los cambios en la base de datos
             //_context.Users.Update(user);
             //await _context.SaveChangesAsync(cancellationToken);
             return Task.CompletedTask;
@@ -167,24 +157,18 @@ namespace DessertApp.Services
 
             try
             {
-                
-                // Marcar el usuario como modificado
                 _context.Users.Update(user);
 
-                // Guardar los cambios en la base de datos
                 await _context.SaveChangesAsync(cancellationToken);
 
-                // Devolver un resultado exitoso
                 return IdentityResult.Success;
             }
             catch (DbUpdateConcurrencyException)
             {
-                // Manejo de la excepción de concurrencia
                 return IdentityResult.Failed(new IdentityError { Description = "El usuario fue modificado por otra operación." });
             }
             catch (Exception ex)
             {
-                // Manejo de otros errores
                 return IdentityResult.Failed(new IdentityError { Description = ex.Message });
             }
         }

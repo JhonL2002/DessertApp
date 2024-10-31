@@ -2,6 +2,7 @@ using DessertApp.Models;
 using DessertApp.Models.Data;
 using DessertApp.Services;
 using DessertApp.Services.EmailServices;
+using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Data.SqlClient;
@@ -18,19 +19,31 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLString"));
 });
 
-//builder.Services.AddDefaultIdentity<AppUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AppDbContext>();
 
 //Add identity services to project
-builder.Services.AddIdentity<AppUser, AppRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
+builder.Services.AddIdentity<AppUser, AppRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = true;
+})
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddRazorPages();
 
 //Identity Services
 builder.Services.AddTransient<IUserStore<AppUser>, AppUserStore>();
 builder.Services.AddTransient<IRoleStore<AppRole>, AppRoleStore>();
+
+//Send Email services
+builder.Services.AddTransient<IMailjetClient>(provider =>
+{
+    //Add the ApiKey and SecretKey from Mailjet
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    //The ApiKey and SecretKey added in secrets.json of DessertApp Project
+    return new MailjetClient(configuration["EmailCredentials:ApiKey"], configuration["EmailCredentials:SecretKey"]);
+});
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddTransient<IEmailRequestBuilder, MailjetEmailRequestBuilder>();
 
 
 var app = builder.Build();
