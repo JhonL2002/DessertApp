@@ -1,6 +1,7 @@
 ﻿using DessertApp.Models;
 using DessertApp.Models.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,14 +18,18 @@ namespace DessertApp.Services
         {
             _context = context;
         }
-        public Task<IdentityResult> CreateAsync(AppRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(AppRole role, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _context.Roles.Add(role);
+            await _context.SaveChangesAsync(cancellationToken);
+            return IdentityResult.Success;
         }
 
-        public Task<IdentityResult> DeleteAsync(AppRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> DeleteAsync(AppRole role, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _context.Roles.Remove(role);
+            await _context.SaveChangesAsync(cancellationToken);
+            return IdentityResult.Success;
         }
 
         public void Dispose()
@@ -42,44 +47,48 @@ namespace DessertApp.Services
         }
 
 
-        public Task<AppRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken)
+        public async Task<AppRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _context.Roles.FindAsync([roleId], cancellationToken);
         }
 
-        public Task<AppRole?> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
+        public async Task<AppRole?> FindByNameAsync(string normalizedRoleName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _context.Roles.FirstOrDefaultAsync(r => r.NormalizedName == normalizedRoleName, cancellationToken);
         }
 
         public Task<string?> GetNormalizedRoleNameAsync(AppRole role, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(role.NormalizedName);
         }
 
         public Task<string> GetRoleIdAsync(AppRole role, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(role.Id);
         }
 
         public Task<string?> GetRoleNameAsync(AppRole role, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(role.Name);
         }
 
         public Task SetNormalizedRoleNameAsync(AppRole role, string? normalizedName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            role.NormalizedName = normalizedName;
+            return Task.CompletedTask;
         }
 
         public Task SetRoleNameAsync(AppRole role, string? roleName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            role.Name = roleName;
+            return Task.CompletedTask;
         }
 
-        public Task<IdentityResult> UpdateAsync(AppRole role, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(AppRole role, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            _context.Roles.Update(role);
+            await _context.SaveChangesAsync(cancellationToken);
+            return IdentityResult.Success;
         }
     }
 }

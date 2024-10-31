@@ -48,6 +48,13 @@ builder.Services.AddTransient<IEmailRequestBuilder, MailjetEmailRequestBuilder>(
 
 var app = builder.Build();
 
+//Call SeedRolesAsync to create default roles
+using (var scope = app.Services.CreateScope())
+{
+    var serviceProvider = scope.ServiceProvider;
+    await RoleInitializer.SeedRolesAsync(serviceProvider);
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
