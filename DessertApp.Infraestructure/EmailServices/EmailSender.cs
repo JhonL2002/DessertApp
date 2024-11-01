@@ -1,23 +1,18 @@
 ﻿using Mailjet.Client;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Build.Framework;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DessertApp.Services.EmailServices
+
+namespace DessertApp.Services.IEmailServices
 {
     public class EmailSender : IEmailSender
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<EmailSender> _logger;
         private readonly IMailjetClient _mailjetClient;
-        private readonly IEmailRequestBuilder _emailRequestBuilder;
-        public EmailSender(IConfiguration configuration, ILogger<EmailSender> logger, IMailjetClient mailjetClient, IEmailRequestBuilder emailRequestBuilder)
+        private readonly IEmailRequestBuilder<MailjetRequest> _emailRequestBuilder;
+        public EmailSender(IConfiguration configuration, ILogger<EmailSender> logger, IMailjetClient mailjetClient, IEmailRequestBuilder<MailjetRequest> emailRequestBuilder)
         {
             _configuration = configuration;
             _logger = logger;

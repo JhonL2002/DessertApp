@@ -1,15 +1,11 @@
-﻿using Mailjet.Client;
+﻿
+using Mailjet.Client;
 using Mailjet.Client.Resources;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DessertApp.Services.EmailServices
+namespace DessertApp.Services.IEmailServices
 {
-    public class MailjetEmailRequestBuilder : IEmailRequestBuilder
+    public class MailjetEmailRequestBuilder : IEmailRequestBuilder<MailjetRequest>
     {
         private readonly MailjetRequest _request;
         public MailjetEmailRequestBuilder()
@@ -19,7 +15,7 @@ namespace DessertApp.Services.EmailServices
                 Resource = Send.Resource
             };
         }
-        public IEmailRequestBuilder AddRecipient(string recipientEmail)
+        public IEmailRequestBuilder<MailjetRequest> AddRecipient(string recipientEmail)
         {
             _request.Property(Send.Recipients, new JArray { new JObject { { "Email", recipientEmail } } });
             return this;
@@ -30,25 +26,25 @@ namespace DessertApp.Services.EmailServices
             return _request;
         }
 
-        public IEmailRequestBuilder SetFromEmail(string fromEmail)
+        public IEmailRequestBuilder<MailjetRequest> SetFromEmail(string fromEmail)
         {
             _request.Property(Send.FromEmail, fromEmail);
             return this;
         }
 
-        public IEmailRequestBuilder SetFromName(string fromName)
+        public IEmailRequestBuilder<MailjetRequest> SetFromName(string fromName)
         {
             _request.Property(Send.FromName, fromName);
             return this;
         }
 
-        public IEmailRequestBuilder SetHtmlContent(string htmlContent)
+        public IEmailRequestBuilder<MailjetRequest> SetHtmlContent(string htmlContent)
         {
             _request.Property(Send.HtmlPart, htmlContent);
             return this;
         }
 
-        public IEmailRequestBuilder SetSubject(string subject)
+        public IEmailRequestBuilder<MailjetRequest> SetSubject(string subject)
         {
             _request.Property(Send.Subject, subject);
             return this;

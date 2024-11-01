@@ -1,12 +1,11 @@
 using DessertApp.Models;
 using DessertApp.Models.Data;
 using DessertApp.Services;
-using DessertApp.Services.EmailServices;
+using DessertApp.Services.IEmailServices;
 using DessertApp.Services.RoleStoreServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +43,7 @@ builder.Services.AddTransient<IMailjetClient>(provider =>
     return new MailjetClient(configuration["EmailCredentials:ApiKey"], configuration["EmailCredentials:SecretKey"]);
 });
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-builder.Services.AddTransient<IEmailRequestBuilder, MailjetEmailRequestBuilder>();
+builder.Services.AddTransient<IEmailRequestBuilder<MailjetRequest>, MailjetEmailRequestBuilder>();
 
 
 var app = builder.Build();
