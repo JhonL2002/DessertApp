@@ -1,9 +1,11 @@
+using DessertApp.Infraestructure.ConfigurationServices;
 using DessertApp.Infraestructure.Data;
 using DessertApp.Infraestructure.DataInitializerServices;
 using DessertApp.Infraestructure.EmailServices;
 using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Infraestructure.RoleServices;
 using DessertApp.Infraestructure.UserServices;
+using DessertApp.Services.ConfigurationServices;
 using DessertApp.Services.DataInitializerServices;
 using DessertApp.Services.IEmailServices;
 using DessertApp.Services.RoleStoreServices;
@@ -32,7 +34,6 @@ builder.Services.AddIdentity<AppUser, AppRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-
 builder.Services.AddRazorPages();
 
 //Identity Services
@@ -44,15 +45,11 @@ builder.Services.AddScoped<IRoleStore<AppRole>, AppRoleStore>();
 builder.Services.AddScoped<IDataInitializer, DataInitializer>();
 
 //Send Email services
-builder.Services.AddTransient<IMailjetClient>(provider =>
-{
-    //Add the ApiKey and SecretKey from Mailjet
-    var configuration = provider.GetRequiredService<IConfiguration>();
-    //The ApiKey and SecretKey added in secrets.json of DessertApp Project
-    return new MailjetClient(configuration["EmailCredentials:ApiKey"], configuration["EmailCredentials:SecretKey"]);
-});
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailRequestBuilder<MailjetRequest>, MailjetEmailRequestBuilder>();
+
+//Customized Configuration Services
+builder.Services.AddTransient<IConfigurationFactory<EmailSender, IConfiguration>, ConfigurationFactory<EmailSender>>();
 
 
 var app = builder.Build();

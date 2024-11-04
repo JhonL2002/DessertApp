@@ -1,4 +1,5 @@
-﻿using DessertApp.Services.IEmailServices;
+﻿using DessertApp.Services.ConfigurationServices;
+using DessertApp.Services.IEmailServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
@@ -9,25 +10,30 @@ namespace DessertApp.Infraestructure.EmailServices
 {
     public class EmailSender : IEmailSender
     {
-        private readonly IConfiguration _configuration;
         private readonly ILogger<EmailSender> _logger;
-        private readonly IMailjetClient _mailjetClient;
+        private readonly MailjetClient _mailjetClient;
         private readonly IEmailRequestBuilder<MailjetRequest> _emailRequestBuilder;
-        public EmailSender(IConfiguration configuration, ILogger<EmailSender> logger, IMailjetClient mailjetClient, IEmailRequestBuilder<MailjetRequest> emailRequestBuilder)
+        private readonly string _fromEmail;
+        public EmailSender(ILogger<EmailSender> logger, IEmailRequestBuilder<MailjetRequest> emailRequestBuilder, IConfigurationFactory<EmailSender, IConfiguration> configurationFactory)
         {
-            _configuration = configuration;
             _logger = logger;
-            _mailjetClient = mailjetClient;
             _emailRequestBuilder = emailRequestBuilder;
+
+            //Configure and read secrets for MailJet from Infraestructure Layer
+            var configuration = configurationFactory.CreateConfiguration();
+            var apiKey = configuration["EmailCredentials:ApiKey"];
+            var secretKey = configuration["EmailCredentials:SecretKey"];
+            _fromEmail = configuration["EmailSenderConfig:FromEmail"]!;
+
+            _mailjetClient = new MailjetClient(apiKey, secretKey);
         }
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             try
             {
                 //Build email content to send
-                //The FromEmail property added at secrets.json of DessertApp Project
                 var request = _emailRequestBuilder
-                    .SetFromEmail(_configuration["EmailSenderConfig:FromEmail"]!)
+                    .SetFromEmail(_fromEmail)
                     .SetFromName("Application Team")
                     .SetSubject(subject)
                     .SetHtmlContent(htmlMessage)
