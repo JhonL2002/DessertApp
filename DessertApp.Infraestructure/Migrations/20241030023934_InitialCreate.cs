@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DessertApp.Models.Migrations
+namespace DessertApp.Infraestructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

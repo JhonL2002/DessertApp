@@ -1,6 +1,10 @@
-using DessertApp.Models;
-using DessertApp.Models.Data;
-using DessertApp.Services;
+using DessertApp.Infraestructure.Data;
+using DessertApp.Infraestructure.DataInitializerServices;
+using DessertApp.Infraestructure.EmailServices;
+using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Infraestructure.RoleServices;
+using DessertApp.Infraestructure.UserServices;
+using DessertApp.Services.DataInitializerServices;
 using DessertApp.Services.IEmailServices;
 using DessertApp.Services.RoleStoreServices;
 using Mailjet.Client;
@@ -16,7 +20,8 @@ builder.Services.AddControllersWithViews();
 //Add SQLServer database to project
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("SQLString"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SQLString"),
+        options => options.MigrationsAssembly("DessertApp.Infraestructure"));
 });
 
 //Add identity services to project
@@ -33,6 +38,10 @@ builder.Services.AddRazorPages();
 //Identity Services
 builder.Services.AddScoped<IUserStore<AppUser>, AppUserStore>();
 builder.Services.AddScoped<IExtendedRoleStore<AppRole>, AppRoleStore>();
+builder.Services.AddScoped<IRoleStore<AppRole>, AppRoleStore>();
+
+//Data Initializer Services
+builder.Services.AddScoped<IDataInitializer, DataInitializer>();
 
 //Send Email services
 builder.Services.AddTransient<IMailjetClient>(provider =>
@@ -51,10 +60,10 @@ var app = builder.Build();
 //Call SeedRolesAsync to create default roles
 using (var scope = app.Services.CreateScope())
 {
-    var serviceProvider = scope.ServiceProvider;
-    var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-    await DataInitializer.SeedRolesAsync(serviceProvider);
-    await DataInitializer.SeedAdminUserAsync(serviceProvider, configuration["AdminUserCredentials:AdminEmail"]!);
+    var dataInitializer = scope.ServiceProvider.GetRequiredService<IDataInitializer>(); 
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    await dataInitializer.InitializeRolesAsync();
+    await dataInitializer.InitializeAdminUserAsync(configuration["AdminUserCredentials:AdminEmail"]!);
 }
 
 // Configure the HTTP request pipeline.

@@ -7,12 +7,4 @@
     <UserSecretsId>f03464b8-09bc-401c-b04b-11e3d84e215d</UserSecretsId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.10" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\DessertApp.Models\DessertApp.Models.csproj" />
-  </ItemGroup>
-
 </Project>

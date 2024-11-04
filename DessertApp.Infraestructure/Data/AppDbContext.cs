@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -6,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DessertApp.Models.Data
+namespace DessertApp.Infraestructure.Data
 {
     public class AppDbContext : IdentityDbContext<AppUser, AppRole, string>
     {

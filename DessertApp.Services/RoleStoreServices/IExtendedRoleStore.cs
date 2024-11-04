@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-
+﻿
 namespace DessertApp.Services.RoleStoreServices
 {
     /// <summary>
@@ -7,7 +6,7 @@ namespace DessertApp.Services.RoleStoreServices
     /// as get all available roles from system.
     /// </summary>
     /// <typeparam name="TRole">The entity role type</typeparam>
-    public interface IExtendedRoleStore<TRole> : IRoleStore<TRole> where TRole : class
+    public interface IExtendedRoleStore<TRole>
     {
         /// <summary>
         /// Get a list of all available roles asynchronously

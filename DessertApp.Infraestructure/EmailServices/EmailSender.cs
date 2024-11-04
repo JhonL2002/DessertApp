@@ -1,10 +1,11 @@
-﻿using Mailjet.Client;
+﻿using DessertApp.Services.IEmailServices;
+using Mailjet.Client;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 
-namespace DessertApp.Services.IEmailServices
+namespace DessertApp.Infraestructure.EmailServices
 {
     public class EmailSender : IEmailSender
     {

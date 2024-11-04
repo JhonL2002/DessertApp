@@ -1,9 +1,9 @@
-﻿using DessertApp.Models;
-using DessertApp.Models.Data;
+﻿using DessertApp.Infraestructure.Data;
+using DessertApp.Infraestructure.IdentityModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace DessertApp.Services
+namespace DessertApp.Infraestructure.UserServices
 {
     public class AppUserStore : IUserStore<AppUser>, IUserEmailStore<AppUser>, IUserPasswordStore<AppUser>, IUserRoleStore<AppUser>
     {

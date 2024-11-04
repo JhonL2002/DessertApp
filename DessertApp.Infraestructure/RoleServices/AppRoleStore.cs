@@ -1,12 +1,13 @@
-﻿using DessertApp.Models;
-using DessertApp.Models.Data;
+﻿using DessertApp.Infraestructure.Data;
+using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Models.IdentityModels;
 using DessertApp.Services.RoleStoreServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace DessertApp.Services
+namespace DessertApp.Infraestructure.RoleServices
 {
-    public class AppRoleStore : IExtendedRoleStore<AppRole>
+    public class AppRoleStore : IExtendedRoleStore<AppRole>, IRoleStore<AppRole>
     {
         private readonly AppDbContext _context;
         //private bool _disposed = false;
@@ -41,7 +42,6 @@ namespace DessertApp.Services
                 _context.Dispose();
             }
         }
-
 
         public async Task<AppRole?> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {

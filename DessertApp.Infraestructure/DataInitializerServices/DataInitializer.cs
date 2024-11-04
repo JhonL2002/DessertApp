@@ -1,12 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Models.IdentityModels;
+using DessertApp.Services.DataInitializerServices;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-namespace DessertApp.Models.Data
+namespace DessertApp.Infraestructure.DataInitializerServices
 {
-    public static class DataInitializer
+    public class DataInitializer : IDataInitializer
     {
-        public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
+        private readonly IServiceProvider _serviceProvider;
+        public DataInitializer(IServiceProvider serviceProvider)
         {
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<AppRole>>();
+            _serviceProvider = serviceProvider;
+        }
+        public async Task InitializeRolesAsync()
+        {
+            var roleManager = _serviceProvider.GetRequiredService<RoleManager<AppRole>>();
 
             //Define some roles to use in app
             var roles = new List<AppRole>
@@ -23,13 +31,13 @@ namespace DessertApp.Models.Data
             }
         }
 
-        public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider, string adminEmail)
+        public async Task InitializeAdminUserAsync(string adminEmail)
         {
-            var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
-            var roleManager = serviceProvider.GetRequiredService<RoleManager<AppRole>>();
+            var userManager = _serviceProvider.GetRequiredService<UserManager<AppUser>>();
+            var roleManager = _serviceProvider.GetRequiredService<RoleManager<AppRole>>();
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-            if (adminUser != null && !(await userManager.IsInRoleAsync(adminUser, "Admin")))
+            if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
             {
                 var result = await userManager.AddToRoleAsync(adminUser, "Admin");
                 if (result.Succeeded)

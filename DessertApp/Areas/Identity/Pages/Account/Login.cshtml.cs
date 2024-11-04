@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 using DessertApp.Models;
+using DessertApp.Infraestructure.IdentityModels;
 
 namespace DessertApp.Areas.Identity.Pages.Account
 {
