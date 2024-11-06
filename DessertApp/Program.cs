@@ -7,6 +7,7 @@ using DessertApp.Infraestructure.RoleServices;
 using DessertApp.Infraestructure.UserServices;
 using DessertApp.Services.ConfigurationServices;
 using DessertApp.Services.DataInitializerServices;
+using DessertApp.Services.EmailServices;
 using DessertApp.Services.IEmailServices;
 using DessertApp.Services.RoleStoreServices;
 using Mailjet.Client;
@@ -47,9 +48,12 @@ builder.Services.AddScoped<IDataInitializer, DataInitializer>();
 //Send Email services
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddTransient<IEmailRequestBuilder<MailjetRequest>, MailjetEmailRequestBuilder>();
+builder.Services.AddSingleton<IMailjetClientFactory<MailjetClient>, MailjetClientFactory>();
 
-//Customized Configuration Services
-builder.Services.AddTransient<IConfigurationFactory<EmailSender, IConfiguration>, ConfigurationFactory<EmailSender>>();
+//Customized Configuration Services to read secrets in the Infraestructure layer
+builder.Services.AddTransient<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
+builder.Services.AddSingleton<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
+
 
 
 var app = builder.Build();

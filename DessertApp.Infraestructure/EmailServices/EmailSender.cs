@@ -1,4 +1,5 @@
 ﻿using DessertApp.Services.ConfigurationServices;
+using DessertApp.Services.EmailServices;
 using DessertApp.Services.IEmailServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -13,19 +14,21 @@ namespace DessertApp.Infraestructure.EmailServices
         private readonly ILogger<EmailSender> _logger;
         private readonly MailjetClient _mailjetClient;
         private readonly IEmailRequestBuilder<MailjetRequest> _emailRequestBuilder;
-        private readonly string _fromEmail;
-        public EmailSender(ILogger<EmailSender> logger, IEmailRequestBuilder<MailjetRequest> emailRequestBuilder, IConfigurationFactory<EmailSender, IConfiguration> configurationFactory)
+        public string _fromEmail;
+        public EmailSender(
+            ILogger<EmailSender> logger,
+            IEmailRequestBuilder<MailjetRequest> emailRequestBuilder,
+            IConfigurationFactory<IConfiguration> configurationFactory,
+            IMailjetClientFactory<MailjetClient> mailjetClient)
         {
             _logger = logger;
             _emailRequestBuilder = emailRequestBuilder;
+            _mailjetClient = mailjetClient.CreateClient() ?? throw new InvalidOperationException("No se pudo crear MailjetClient."); ;
 
-            //Configure and read secrets for MailJet from Infraestructure Layer
+            //Additional configuration to create a custom configuration to read secrets
             var configuration = configurationFactory.CreateConfiguration();
-            var apiKey = configuration["EmailCredentials:ApiKey"];
-            var secretKey = configuration["EmailCredentials:SecretKey"];
-            _fromEmail = configuration["EmailSenderConfig:FromEmail"]!;
-
-            _mailjetClient = new MailjetClient(apiKey, secretKey);
+            _fromEmail = configuration["EmailSenderConfig:FromEmail"]! ?? throw new ArgumentNullException(nameof(_fromEmail), "El valor de 'FromEmail' no puede ser nulo.");
+            
         }
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {

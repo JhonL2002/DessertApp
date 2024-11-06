@@ -1,20 +1,22 @@
-﻿using DessertApp.Services.ConfigurationServices;
+﻿using DessertApp.Infraestructure.Data;
+using DessertApp.Services.ConfigurationServices;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DessertApp.Infraestructure.ConfigurationServices
 {
-    public class ConfigurationFactory<T> : IConfigurationFactory<T, IConfiguration> where T : class
+    public class ConfigurationFactory : IConfigurationFactory<IConfiguration>
     {
         public IConfiguration CreateConfiguration()
         {
             return new ConfigurationBuilder()
-                .SetBasePath(AppContext.BaseDirectory)
-                .AddUserSecrets<T>()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddUserSecrets<AppDbContextFactory>()
                 .Build();
         }
     }
