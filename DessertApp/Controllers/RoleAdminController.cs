@@ -1,5 +1,4 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
-using DessertApp.Models.IdentityModels;
 using DessertApp.Services.RoleStoreServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -23,12 +22,20 @@ namespace DessertApp.Controllers
             return View(await _extendedRoleStore.GetAllRolesAsync(cancellationToken));
         }
 
+        public IActionResult Create()
+        {
+            return View();
+        }
+
         // POST: RoleAdmin/Create
         [HttpPost]
         public async Task<IActionResult> Create(AppRole role)
         {
             if (ModelState.IsValid)
             {
+                await _roleStore.SetRoleNameAsync(role,role.Name, CancellationToken.None);
+                await _roleStore.SetNormalizedRoleNameAsync(role, role.Name!.ToUpperInvariant(),CancellationToken.None);
+                await _extendedRoleStore.SetConcurrencyStampAsync(role, Guid.NewGuid().ToString(), CancellationToken.None);
                 var result = await _roleStore.CreateAsync(role, CancellationToken.None);
                 if (result.Succeeded)
                 {

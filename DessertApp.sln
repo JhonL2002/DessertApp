@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DessertApp.Services", "Dess
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DessertApp.Models", "DessertApp.Models\DessertApp.Models.csproj", "{81F62FF4-0529-471C-8B22-C28038C1B2FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DessertApp.Infraestructure", "DessertApp.Infraestructure\DessertApp.Infraestructure.csproj", "{3D87B0F7-AE6A-4BFA-82AC-78919D2503E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DessertApp.Infraestructure", "DessertApp.Infraestructure\DessertApp.Infraestructure.csproj", "{3D87B0F7-AE6A-4BFA-82AC-78919D2503E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DessertApp.Tests", "DessertApp.Tests\DessertApp.Tests.csproj", "{B3A663F8-DBB0-491E-8C81-4741E380AD95}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{3D87B0F7-AE6A-4BFA-82AC-78919D2503E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D87B0F7-AE6A-4BFA-82AC-78919D2503E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D87B0F7-AE6A-4BFA-82AC-78919D2503E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3A663F8-DBB0-491E-8C81-4741E380AD95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3A663F8-DBB0-491E-8C81-4741E380AD95}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3A663F8-DBB0-491E-8C81-4741E380AD95}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3A663F8-DBB0-491E-8C81-4741E380AD95}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

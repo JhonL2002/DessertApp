@@ -91,5 +91,11 @@ namespace DessertApp.Infraestructure.RoleServices
         {
             return await _context.Roles.ToListAsync(cancellationToken);
         }
+
+        public Task SetConcurrencyStampAsync(AppRole role, string? concurrencyStamp, CancellationToken cancellationToken)
+        {
+            role.ConcurrencyStamp = concurrencyStamp;
+            return Task.CompletedTask;
+        }
     }
 }
