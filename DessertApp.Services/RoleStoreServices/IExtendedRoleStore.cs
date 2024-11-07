@@ -14,6 +14,7 @@ namespace DessertApp.Services.RoleStoreServices
         /// <param name="cancellationToken">A cancellation token to watch while waiting for the task to complete</param>
         /// <returns>A task that represents the asynchronous operation, containing an enumeration of all roles</returns>
         Task<IEnumerable<TRole>> GetAllRolesAsync(CancellationToken cancellationToken);
+        Task<TRole> GetRoleDetailsAsync(string id, CancellationToken cancellationToken);
         Task SetConcurrencyStampAsync(TRole role, string? concurrencyStamp, CancellationToken cancellationToken);
     }
 }

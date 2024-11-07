@@ -3,12 +3,14 @@ using DessertApp.Infraestructure.Data;
 using DessertApp.Infraestructure.DataInitializerServices;
 using DessertApp.Infraestructure.EmailServices;
 using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Infraestructure.Repositories;
 using DessertApp.Infraestructure.RoleServices;
 using DessertApp.Infraestructure.UserServices;
 using DessertApp.Services.ConfigurationServices;
 using DessertApp.Services.DataInitializerServices;
 using DessertApp.Services.EmailServices;
 using DessertApp.Services.IEmailServices;
+using DessertApp.Services.Repositories;
 using DessertApp.Services.RoleStoreServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
@@ -53,6 +55,9 @@ builder.Services.AddSingleton<IMailjetClientFactory<MailjetClient>, MailjetClien
 //Customized Configuration Services to read secrets in the Infraestructure layer
 builder.Services.AddTransient<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
 builder.Services.AddSingleton<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
+
+//Repositories services
+builder.Services.AddScoped<IGenericRepository<AppRole, IdentityResult, string>, RoleRepository>();
 
 
 

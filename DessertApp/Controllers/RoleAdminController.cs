@@ -1,4 +1,5 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Services.Repositories;
 using DessertApp.Services.RoleStoreServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,17 +10,30 @@ namespace DessertApp.Controllers
     [Authorize(Roles = "Admin")]
     public class RoleAdminController : Controller
     {
-        private readonly IExtendedRoleStore<AppRole> _extendedRoleStore;
-        private readonly IRoleStore<AppRole> _roleStore;
-        public RoleAdminController(IExtendedRoleStore<AppRole> extendedRoleStore, IRoleStore<AppRole> roleStore)
+        private readonly IGenericRepository<AppRole, IdentityResult,string> _roleRepository;
+        public RoleAdminController(IGenericRepository<AppRole, IdentityResult,string> roleRepository)
         {
-            _roleStore = roleStore;
-            _extendedRoleStore = extendedRoleStore;
+            _roleRepository = roleRepository;
         }
 
-        public async Task <IActionResult> Index(CancellationToken cancellationToken)
+        public async Task<IActionResult> Index()
         {
-            return View(await _extendedRoleStore.GetAllRolesAsync(cancellationToken));
+            return View(await _roleRepository.GetAllAsync(CancellationToken.None));
+        }
+
+        // GET: RoleAdmin/Details/string_guid
+        public async Task<IActionResult> Details(string? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            var role = await _roleRepository.GetDetailsAsync(id, CancellationToken.None);
+            if (role == null)
+            {
+                return NotFound();
+            }
+            return View(role);
         }
 
         public IActionResult Create()
@@ -33,10 +47,7 @@ namespace DessertApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _roleStore.SetRoleNameAsync(role,role.Name, CancellationToken.None);
-                await _roleStore.SetNormalizedRoleNameAsync(role, role.Name!.ToUpperInvariant(),CancellationToken.None);
-                await _extendedRoleStore.SetConcurrencyStampAsync(role, Guid.NewGuid().ToString(), CancellationToken.None);
-                var result = await _roleStore.CreateAsync(role, CancellationToken.None);
+                var result = await _roleRepository.CreateAsync(role, CancellationToken.None);
                 if (result.Succeeded)
                 {
                     return RedirectToAction("Index");
@@ -56,7 +67,7 @@ namespace DessertApp.Controllers
             {
                 return NotFound();
             }
-            var role = await _roleStore.FindByIdAsync(id,CancellationToken.None);
+            var role = await _roleRepository.GetByIdAsync(id,CancellationToken.None);
             if (role == null)
             {
                 return NotFound();
