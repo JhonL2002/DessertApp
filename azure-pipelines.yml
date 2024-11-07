@@ -16,43 +16,44 @@ variables:
   azureSQLConnectionString: $(AZURE_SQL_CONNECTION_STRING)
 
 steps:
-# Install .NET 8 SDK
+# Instalar .NET 8 SDK
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
     version: '8.0.400'
-# Restore NuGet packages
+
+# Restaurar paquetes NuGet
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
     restoreSolution: '$(solution)'
 
-# Compile project using dotnet build
+# Compilar el proyecto
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     projects: '$(solution)'
     arguments: '--configuration $(buildConfiguration)'
 
-# Execute tests
+# Ejecutar pruebas
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
     projects: '$(solution)'
     arguments: '--configuration $(buildConfiguration)'
 
-# Publish artefacts to deployment
+# Publicar artefactos para despliegue
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     projects: '$(solution)'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactStagingDirectory)'
 
+# Establecer cadena de conexión
 - script: |
     echo "##vso[task.setvariable variable=ConnectionStrings__DefaultConnection]$(azureSQLConnectionString)"
   displayName: 'Set connection string variable'
 
-# Publish artefacts, can be used in other pipelines or deployment environments
+# Publicar artefactos
 - publish: $(build.artifactStagingDirectory)
   artifact: 'drop'
-
