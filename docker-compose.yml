@@ -1,0 +1,16 @@
+services:
+  dessertapp:
+    image: ${DOCKER_REGISTRY-}dessertapp
+    build:
+      context: .
+      dockerfile: DessertApp/Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - "/c/Users/lordl/AppData/Roaming/Microsoft/UserSecrets/509ac4a2-b87d-4da3-be58-c4f80f3a659c/secrets.json:/app/secrets.json"
+    environment:
+      - ASPNETCORE_ENVIRONMENT = ${ASPNETCORE_ENVIRONMENT:-Development}
+      - ASPNETCORE_URLS=http://+:5000
+     
+
+  
