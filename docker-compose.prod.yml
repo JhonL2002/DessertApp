@@ -1,0 +1,13 @@
+﻿services:
+  dessertapp:
+    container_name: dessertapp-production
+    image: jhonl2002/dessertapp:latest
+    build:
+      context: .
+      dockerfile: DessertApp/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - 8080:8080 # HTTP
+

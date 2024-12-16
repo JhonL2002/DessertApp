@@ -1,12 +1,14 @@
 services:
   dessertapp:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+      # Configure self signed certificate to use https in Docker, use an .env file to save passwords and sensitive configurations
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
     ports:
-      - "8080"
-      - "8081"
+      - 8080:8080 # HTTP
+      - 8081:8081 # HTTPS
     volumes:
-      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
-      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - "/c/Users/lordl/AppData/Roaming/Microsoft/UserSecrets/509ac4a2-b87d-4da3-be58-c4f80f3a659c/secrets.json:/app/secrets.json"
+      - "/c/Users/lordl/.aspnet/https:/https:ro"
