@@ -1,4 +1,5 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Models.IdentityModels;
 using DessertApp.Services.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,8 +10,8 @@ namespace DessertApp.Controllers
     [Authorize(Roles = "Admin")]
     public class RoleAdminController : Controller
     {
-        private readonly IGenericRepository<AppRole, IdentityResult,string> _roleRepository;
-        public RoleAdminController(IGenericRepository<AppRole, IdentityResult,string> roleRepository)
+        private readonly IGenericRepository<IAppRole, IdentityResult,string> _roleRepository;
+        public RoleAdminController(IGenericRepository<IAppRole, IdentityResult,string> roleRepository)
         {
             _roleRepository = roleRepository;
         }
@@ -42,7 +43,7 @@ namespace DessertApp.Controllers
 
         // POST: RoleAdmin/Create
         [HttpPost]
-        public async Task<IActionResult> Create(AppRole role)
+        public async Task<IActionResult> Create(IAppRole role)
         {
             if (ModelState.IsValid)
             {

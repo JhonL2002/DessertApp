@@ -6,5 +6,6 @@ namespace DessertApp.Infraestructure.IdentityModels
 {
     public class AppUser : IdentityUser , IAppUser
     {
+        //Add different properties here
     }
 }

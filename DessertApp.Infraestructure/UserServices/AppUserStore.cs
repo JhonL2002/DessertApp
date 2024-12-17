@@ -1,38 +1,37 @@
-﻿using DessertApp.Infraestructure.Data;
+﻿using DessertApp.Infraestructure.ConfigurationServices;
+using DessertApp.Infraestructure.Data;
 using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Models.IdentityModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace DessertApp.Infraestructure.UserServices
 {
-    public class AppUserStore : IUserStore<AppUser>, IUserEmailStore<AppUser>, IUserPasswordStore<AppUser>, IUserRoleStore<AppUser>
+    public class AppUserStore : IUserStore<IAppUser>, IUserEmailStore<IAppUser>, IUserPasswordStore<IAppUser>, IUserRoleStore<IAppUser>
     {
         private readonly AppDbContext _context;
-        //private bool _disposed = false;
 
         public AppUserStore(AppDbContext context)
         {
             _context = context;
         }
-        public async Task<IdentityResult> CreateAsync(AppUser user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(IAppUser user, CancellationToken cancellationToken)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-
-            _context.Users.Add(user);
-
+            /*if (user is not AppUser appUser)
+            {
+                throw new InvalidCastException("The provider user is not a type AppUser");
+            }*/
+            var appUser = VerifyCastingEntity<IAppUser, AppUser>.VerifyObject(user);
+            _context.Users.Add(appUser);
             var result = await _context.SaveChangesAsync(cancellationToken);
-
             return result > 0 ? IdentityResult.Success : IdentityResult.Failed(new IdentityError { Description = "Failed to create user." });
         }
 
-        public async Task<IdentityResult> DeleteAsync(AppUser user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> DeleteAsync(IAppUser user, CancellationToken cancellationToken)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
-
-            _context.Users.Remove(user);
-
+            var appUser = VerifyCastingEntity<IAppUser, AppUser>.VerifyObject(user);
+            _context.Users.Remove(appUser);
             var result = await _context.SaveChangesAsync(cancellationToken);
-
             return result > 0 ? IdentityResult.Success : IdentityResult.Failed(new IdentityError { Description = "Failed to delete user." });
         }
 
@@ -50,87 +49,87 @@ namespace DessertApp.Infraestructure.UserServices
             }
         }
 
-        public async Task<AppUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        public async Task<IAppUser?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
             return await _context.Users
                .FirstOrDefaultAsync(u => u.NormalizedEmail == normalizedEmail, cancellationToken);
         }
 
-        public async Task<AppUser?> FindByIdAsync(string userId, CancellationToken cancellationToken)
+        public async Task<IAppUser?> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(userId)) throw new ArgumentNullException(nameof(userId));
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
         }
 
-        public async Task<AppUser?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public async Task<IAppUser?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(normalizedUserName)) throw new ArgumentNullException(nameof(normalizedUserName));
             return await _context.Users
                 .FirstOrDefaultAsync(u => u.NormalizedUserName == normalizedUserName, cancellationToken);
         }
 
-        public Task<string?> GetEmailAsync(AppUser user, CancellationToken cancellationToken)
+        public Task<string?> GetEmailAsync(IAppUser user, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             return Task.FromResult(user.Email);
         }
 
-        public Task<bool> GetEmailConfirmedAsync(AppUser user, CancellationToken cancellationToken)
+        public Task<bool> GetEmailConfirmedAsync(IAppUser user, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             return Task.FromResult(user.EmailConfirmed);
         }
 
-        public Task<string?> GetNormalizedEmailAsync(AppUser user, CancellationToken cancellationToken)
+        public Task<string?> GetNormalizedEmailAsync(IAppUser user, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             return Task.FromResult(user.NormalizedEmail);
         }
 
-        public Task<string?> GetNormalizedUserNameAsync(AppUser user, CancellationToken cancellationToken)
+        public Task<string?> GetNormalizedUserNameAsync(IAppUser user, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             return Task.FromResult(user.NormalizedUserName);
         }
 
-        public Task<string> GetUserIdAsync(AppUser user, CancellationToken cancellationToken)
+        public Task<string> GetUserIdAsync(IAppUser user, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             return Task.FromResult(user.Id);
         }
 
-        public Task<string?> GetUserNameAsync(AppUser user, CancellationToken cancellationToken)
+        public Task<string?> GetUserNameAsync(IAppUser user, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             return Task.FromResult(user.UserName);
         }
 
-        public Task SetEmailAsync(AppUser user, string? email, CancellationToken cancellationToken)
+        public Task SetEmailAsync(IAppUser user, string? email, CancellationToken cancellationToken)
         {
             user.Email = email;
             return Task.CompletedTask;
         }
 
-        public Task SetEmailConfirmedAsync(AppUser user, bool confirmed, CancellationToken cancellationToken)
+        public Task SetEmailConfirmedAsync(IAppUser user, bool confirmed, CancellationToken cancellationToken)
         {
             user.EmailConfirmed = confirmed;
             return Task.CompletedTask;
         }
 
-        public Task SetNormalizedEmailAsync(AppUser user, string? normalizedEmail, CancellationToken cancellationToken)
+        public Task SetNormalizedEmailAsync(IAppUser user, string? normalizedEmail, CancellationToken cancellationToken)
         {
             user.NormalizedEmail = normalizedEmail;
             return Task.CompletedTask;
         }
 
-        public Task SetNormalizedUserNameAsync(AppUser user, string? normalizedName, CancellationToken cancellationToken)
+        public Task SetNormalizedUserNameAsync(IAppUser user, string? normalizedName, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
@@ -139,7 +138,7 @@ namespace DessertApp.Infraestructure.UserServices
             return Task.CompletedTask;
         }
 
-        public Task SetUserNameAsync(AppUser user, string? userName, CancellationToken cancellationToken)
+        public Task SetUserNameAsync(IAppUser user, string? userName, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             if (userName == null) throw new ArgumentNullException(nameof(userName));
@@ -151,13 +150,13 @@ namespace DessertApp.Infraestructure.UserServices
             return Task.CompletedTask;
         }
 
-        public async Task<IdentityResult> UpdateAsync(AppUser user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(IAppUser user, CancellationToken cancellationToken)
         {
-            if (user == null) throw new ArgumentNullException(nameof(user));
+            var appUser = VerifyCastingEntity<IAppUser, AppUser>.VerifyObject(user);
 
             try
             {
-                _context.Users.Update(user);
+                _context.Users.Update(appUser);
 
                 await _context.SaveChangesAsync(cancellationToken);
 
@@ -165,7 +164,7 @@ namespace DessertApp.Infraestructure.UserServices
             }
             catch (DbUpdateConcurrencyException)
             {
-                return IdentityResult.Failed(new IdentityError { Description = "El usuario fue modificado por otra operación." });
+                return IdentityResult.Failed(new IdentityError { Description = "The user was modified by another operation." });
             }
             catch (Exception ex)
             {
@@ -173,7 +172,7 @@ namespace DessertApp.Infraestructure.UserServices
             }
         }
 
-        public Task SetPasswordHashAsync(AppUser user, string? passwordHash, CancellationToken cancellationToken)
+        public Task SetPasswordHashAsync(IAppUser user, string? passwordHash, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             user.PasswordHash = passwordHash;
@@ -181,19 +180,19 @@ namespace DessertApp.Infraestructure.UserServices
             return Task.CompletedTask;
         }
 
-        public Task<string?> GetPasswordHashAsync(AppUser user, CancellationToken cancellationToken)
+        public Task<string?> GetPasswordHashAsync(IAppUser user, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             return Task.FromResult(user.PasswordHash);
         }
 
-        public Task<bool> HasPasswordAsync(AppUser user, CancellationToken cancellationToken)
+        public Task<bool> HasPasswordAsync(IAppUser user, CancellationToken cancellationToken)
         {
             if (user == null) throw new ArgumentNullException(nameof(user));
             return Task.FromResult(user.PasswordHash != null);
         }
 
-        public async Task AddToRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
+        public async Task AddToRoleAsync(IAppUser user, string roleName, CancellationToken cancellationToken)
         {
             var role = await _context.Roles.SingleOrDefaultAsync(r => r.Name == roleName, cancellationToken);
             if (role == null) throw new InvalidOperationException("Role not found.");
@@ -208,7 +207,7 @@ namespace DessertApp.Infraestructure.UserServices
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task RemoveFromRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
+        public async Task RemoveFromRoleAsync(IAppUser user, string roleName, CancellationToken cancellationToken)
         {
             var userRole = await _context.UserRoles
             .SingleOrDefaultAsync(ur => ur.UserId == user.Id && ur.RoleId == roleName, cancellationToken);
@@ -220,7 +219,7 @@ namespace DessertApp.Infraestructure.UserServices
             }
         }
 
-        public async Task<IList<string>> GetRolesAsync(AppUser user, CancellationToken cancellationToken)
+        public async Task<IList<string>> GetRolesAsync(IAppUser user, CancellationToken cancellationToken)
         {
             var roles =  await _context.UserRoles
                 .Where(ur => ur.UserId == user.Id)
@@ -233,7 +232,7 @@ namespace DessertApp.Infraestructure.UserServices
             return roles!;
         }
 
-        public async Task<bool> IsInRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
+        public async Task<bool> IsInRoleAsync(IAppUser user, string roleName, CancellationToken cancellationToken)
         {
             return await _context.UserRoles
                 .Join(_context.Roles,
@@ -243,9 +242,9 @@ namespace DessertApp.Infraestructure.UserServices
                 .AnyAsync(userRole => userRole.ur.UserId == user.Id && userRole.r.Name == roleName, cancellationToken);
         }
 
-        public async Task<IList<AppUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
+        public async Task<IList<IAppUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken)
         {
-            return (IList<AppUser>)await _context.UserRoles
+            return (IList<IAppUser>)await _context.UserRoles
                 .Join(_context.Roles,
                     ur => ur.RoleId,
                     r => r.Id,
