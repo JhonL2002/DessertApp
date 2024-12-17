@@ -1,5 +1,4 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
-using DessertApp.Models.IdentityModels;
 using DessertApp.Services.DataInitializerServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +34,20 @@ namespace DessertApp.Infraestructure.DataInitializerServices
         {
             var userManager = _serviceProvider.GetRequiredService<UserManager<AppUser>>();
             var roleManager = _serviceProvider.GetRequiredService<RoleManager<AppRole>>();
+            if (string.IsNullOrEmpty(adminEmail))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Please give an admin email!");
+                return;
+            }
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+            if (adminUser == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Admin user not found!");
+                return;
+            }
 
             if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
             {
