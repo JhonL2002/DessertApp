@@ -1,6 +1,7 @@
 using DessertApp.Infraestructure.ConfigurationServices;
 using DessertApp.Infraestructure.Data;
 using DessertApp.Services.DataInitializerServices;
+using DessertApp.Services.SecretServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,37 +16,27 @@ if (environment == "Development")
 }
 
 //Add extended services from infraestructure layer
-builder.Services.AddInfraestructureServices(builder.Configuration, environment);
 builder.Services.AddExternalServices();
 builder.Services.AddApplicationServices();
+builder.Services.AddInfraestructureServices(
+    builder.Configuration,
+    environment
+);
 
 // Add general services
 builder.Services.AddControllersWithViews();
-
-//Add identity services to project
-/*builder.Services.AddIdentity<IAppUser, IAppRole>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = true;
-})
-.AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();*/
-
 builder.Services.AddRazorPages();
-
 
 var app = builder.Build();
 
-//Call SeedRolesAsync to create default roles in development scenario
+//Call datainitializer services when application starts
 using (var scope = app.Services.CreateScope())
 {
-    var dataInitializer = scope.ServiceProvider.GetRequiredService<IDataInitializer>();
-
-    //Acess directly to loaded configuration
-    var adminEmail = builder.Configuration["AdminUserCredentials:AdminEmail"];
-    var adminPass = builder.Configuration["AdminUserCredentials:AdminPass"];
-
-    await dataInitializer.InitializeRolesAsync();
-    await dataInitializer.InitializeAdminUserAsync(adminEmail!);
+    var services = scope.ServiceProvider;
+    await builder.Services.InitializeApplicationDataAsync(
+    builder.Configuration,
+    environment,
+    services);
 }
 
 // Configure the HTTP request pipeline.

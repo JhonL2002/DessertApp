@@ -1,4 +1,6 @@
-﻿using DessertApp.Models.IdentityModels;
+﻿using DessertApp.Infraestructure.ConfigurationServices;
+using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Models.IdentityModels;
 using DessertApp.Services.Repositories;
 using DessertApp.Services.RoleStoreServices;
 using Microsoft.AspNetCore.Identity;
@@ -16,10 +18,12 @@ namespace DessertApp.Infraestructure.Repositories
         }
         public async Task<IdentityResult> CreateAsync(IAppRole entity, CancellationToken cancellationToken)
         {
-            await _roleStore.SetRoleNameAsync(entity, entity.Name, cancellationToken);
-            await _roleStore.SetNormalizedRoleNameAsync(entity, entity.Name!.ToUpperInvariant(), cancellationToken);
-            await _extendedRoleStore.SetConcurrencyStampAsync(entity, Guid.NewGuid().ToString(), cancellationToken);
-            return await _roleStore.CreateAsync(entity, cancellationToken);
+            var castedRole = VerifyCastingEntity<IAppRole, AppRole>.VerifyObject(entity);
+            await _roleStore.SetRoleNameAsync(castedRole, castedRole.Name, cancellationToken);
+            await _roleStore.SetNormalizedRoleNameAsync(castedRole, castedRole.Name!.ToUpperInvariant(), cancellationToken);
+            await _extendedRoleStore.SetConcurrencyStampAsync(castedRole, Guid.NewGuid().ToString(), cancellationToken);
+            var result = await _roleStore.CreateAsync(castedRole, cancellationToken);
+            return result;
         }
 
         public async Task<IdentityResult> DeleteAsync(IAppRole entity, CancellationToken cancellationToken)

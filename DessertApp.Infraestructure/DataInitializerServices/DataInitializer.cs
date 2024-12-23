@@ -23,9 +23,16 @@ namespace DessertApp.Infraestructure.DataInitializerServices
             };
             foreach (var role in roles)
             {
-                if (!await roleManager.RoleExistsAsync(role.Name!))
+                try
                 {
-                    await roleManager.CreateAsync(role);
+                    if (!await roleManager.RoleExistsAsync(role.Name!))
+                    {
+                        await roleManager.CreateAsync(role);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error ocurred, verify {ex}");
                 }
             }
         }
@@ -40,33 +47,41 @@ namespace DessertApp.Infraestructure.DataInitializerServices
                 Console.WriteLine("Please give an admin email!");
                 return;
             }
-            var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-            if (adminUser == null)
+            try
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Admin user not found!");
-                return;
-            }
+                var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
-            if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
-            {
-                var result = await userManager.AddToRoleAsync(adminUser, "Admin");
-                if (result.Succeeded)
+                if (adminUser == null)
                 {
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    Console.WriteLine("User assigned successfully to role!");
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Admin user not found!");
+                    return;
+                }
+
+                if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "Admin"))
+                {
+                    var result = await userManager.AddToRoleAsync(adminUser, "Admin");
+                    if (result.Succeeded)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.WriteLine("User assigned successfully to role!");
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"Failed to assign user to role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    }
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"Failed to assign user to role: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                    Console.WriteLine("User with added role already exists!");
                 }
             }
-            else
+            catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("User with added role already exists!");
+                Console.WriteLine($"An error ocurred, verify {ex}");
             }
         }
     }

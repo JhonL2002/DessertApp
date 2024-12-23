@@ -5,6 +5,7 @@ using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Infraestructure.Repositories;
 using DessertApp.Infraestructure.ResilienceServices;
 using DessertApp.Infraestructure.RoleServices;
+using DessertApp.Infraestructure.SecretServices;
 using DessertApp.Infraestructure.UserServices;
 using DessertApp.Models.IdentityModels;
 using DessertApp.Services.ConfigurationServices;
@@ -13,10 +14,10 @@ using DessertApp.Services.EmailServices;
 using DessertApp.Services.IEmailServices;
 using DessertApp.Services.Repositories;
 using DessertApp.Services.RoleStoreServices;
+using DessertApp.Services.SecretServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,32 +32,40 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             IConfiguration configuration,
             string environment)
         {
-            var connectionString = environment == "Development"
-                    ? configuration["SQL_CONNECTION_STRING"]
-                    : configuration.GetConnectionString("AzureSQL");
+            //External services registration
+            services.AddTransient<IManageSecrets, ManageSecrets>();
 
-            //Validate connection string
-            if (!IsValidConnectionString(connectionString) || connectionString == null)
+            //Configure resilience and database connection
+            services.AddDbContext<AppDbContext>((provider ,options) =>
             {
-                services.AddDbContext<AppDbContext>(options =>
+                var secretProvider = provider.GetRequiredService<IManageSecrets>();
+                string connectionString;
+
+                try
                 {
-                    throw new InvalidOperationException("Invalid Connection string, verify the connection string");
-                });
-                return services;
-            }
+                    if (environment == "Development")
+                    {
+                        connectionString = configuration["SQL_CONNECTION_STRING"]!;
+                    }
+                    else
+                    {
+                        connectionString = secretProvider
+                            .GetSecretsAsync("dessertkeyvault", "DessertAppSQL")
+                            .GetAwaiter().GetResult();
+                    }
 
-            //Configure resilience to database connection
-            services.AddDbContext<AppDbContext>(options =>
-            {
                     options.UseSqlServer(connectionString, sqlOptions =>
                     {
                         sqlOptions.MigrationsAssembly("DessertApp.Infraestructure");
-                        /*sqlOptions.EnableRetryOnFailure(
-                            maxRetryCount: 10,
-                            maxRetryDelay: TimeSpan.FromSeconds(10),
-                            errorNumbersToAdd: null);*/
                         sqlOptions.ExecutionStrategy(c => new CustomExecutionStrategies(c, 5, TimeSpan.FromSeconds(10)));
                     });
+                }
+                catch (Exception ex)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"An error ocurred, see details: {ex}");
+                }
+                
             });
 
             //Add filters to logging services
@@ -81,6 +90,7 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddScoped<IExtendedRoleStore<IAppRole>, AppRoleStore>();
             services.AddTransient<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
 
+            //Add identity services (You need to add the implemented classes)
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
@@ -88,33 +98,46 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
-            //Repositories
+            //Services for repositories
             services.AddScoped<IGenericRepository<IAppRole, IdentityResult, string>, RoleRepository>();
             return services;
         }
 
+        //Add external services instead databases (for example, Mailjet and Azure Key Vault)
         public static IServiceCollection AddExternalServices(this IServiceCollection services)
         {
             //Email sender services
-            services.AddTransient<IEmailSender, EmailSender>();
+            services.AddScoped<IEmailSender, EmailSender>();
             services.AddTransient<IEmailRequestBuilder<MailjetRequest>, MailjetEmailRequestBuilder>();
             services.AddSingleton<IMailjetClientFactory<MailjetClient>, MailjetClientFactory>();
+
+            //Add external key vault services (implemented Azure Key Vault)
+            services.AddTransient<IManageSecrets, ManageSecrets>();
             return services;
         }
 
-        private static bool IsValidConnectionString(string? connectionString)
+        //Add initialize data services to application
+        public static async Task InitializeApplicationDataAsync(
+            this IServiceCollection services,
+            IConfiguration configuration,
+            string environment,
+            IServiceProvider serviceProvider)
         {
-            try
-            {
-                using var connection = new SqlConnection(connectionString);
-                connection.Open();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ERROR: Cannot connect to database. See details: {ex.Message}");
-                return false;
-            }
+                var dataInitializer = serviceProvider.GetRequiredService<IDataInitializer>();
+                var secretProvider = serviceProvider.GetRequiredService<IManageSecrets>();
+                string adminEmail;
+
+                if (environment == "Development")
+                {
+                    adminEmail = configuration["AdminUserCredentials:AdminEmail"]!;
+                }
+                else
+                {
+                    adminEmail = await secretProvider.GetSecretsAsync("dessertkeyvault", "DessertAdminApp");
+                }
+
+                await dataInitializer.InitializeRolesAsync();
+                await dataInitializer.InitializeAdminUserAsync(adminEmail);
         }
     }
 }

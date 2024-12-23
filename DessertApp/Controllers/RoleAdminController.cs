@@ -1,4 +1,5 @@
-﻿using DessertApp.Infraestructure.IdentityModels;
+﻿using DessertApp.Infraestructure.ConfigurationServices;
+using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Models.IdentityModels;
 using DessertApp.Services.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -43,8 +44,9 @@ namespace DessertApp.Controllers
 
         // POST: RoleAdmin/Create
         [HttpPost]
-        public async Task<IActionResult> Create(IAppRole role)
+        public async Task<IActionResult> Create(AppRole role)
         {
+            //var castedRole = VerifyCastingEntity<IAppRole, AppRole>.VerifyObject(role);
             if (ModelState.IsValid)
             {
                 var result = await _roleRepository.CreateAsync(role, CancellationToken.None);
