@@ -7,7 +7,6 @@ using DessertApp.Infraestructure.ResilienceServices;
 using DessertApp.Infraestructure.RoleServices;
 using DessertApp.Infraestructure.SecretServices;
 using DessertApp.Infraestructure.UserServices;
-using DessertApp.Models.IdentityModels;
 using DessertApp.Services.ConfigurationServices;
 using DessertApp.Services.DataInitializerServices;
 using DessertApp.Services.EmailServices;
@@ -85,9 +84,9 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddScoped<IDataInitializer, DataInitializer>();
 
             //Application services
-            services.AddScoped<IUserStore<IAppUser>, AppUserStore>();
-            services.AddScoped<IRoleStore<IAppRole>, AppRoleStore>();
-            services.AddScoped<IExtendedRoleStore<IAppRole>, AppRoleStore>();
+            services.AddScoped<IUserStore<AppUser>, AppUserStore>();
+            services.AddScoped<IRoleStore<AppRole>, AppRoleStore>();
+            services.AddScoped<IExtendedRoleStore<AppRole>, AppRoleStore>();
             services.AddTransient<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
 
             //Add identity services (You need to add the implemented classes)
@@ -99,7 +98,7 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             .AddDefaultTokenProviders();
 
             //Services for repositories
-            services.AddScoped<IGenericRepository<IAppRole, IdentityResult, string>, RoleRepository>();
+            services.AddScoped<IGenericRepository<AppRole, IdentityResult, string>, RoleRepository>();
             return services;
         }
 

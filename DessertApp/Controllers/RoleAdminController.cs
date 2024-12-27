@@ -1,6 +1,4 @@
-﻿using DessertApp.Infraestructure.ConfigurationServices;
-using DessertApp.Infraestructure.IdentityModels;
-using DessertApp.Models.IdentityModels;
+﻿using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Services.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -11,8 +9,8 @@ namespace DessertApp.Controllers
     [Authorize(Roles = "Admin")]
     public class RoleAdminController : Controller
     {
-        private readonly IGenericRepository<IAppRole, IdentityResult,string> _roleRepository;
-        public RoleAdminController(IGenericRepository<IAppRole, IdentityResult,string> roleRepository)
+        private readonly IGenericRepository<AppRole, IdentityResult,string> _roleRepository;
+        public RoleAdminController(IGenericRepository<AppRole, IdentityResult,string> roleRepository)
         {
             _roleRepository = roleRepository;
         }
@@ -44,22 +42,18 @@ namespace DessertApp.Controllers
 
         // POST: RoleAdmin/Create
         [HttpPost]
-        public async Task<IActionResult> Create(AppRole role)
+        public async Task<IActionResult> Create(Infraestructure.IdentityModels.AppRole role)
         {
-            //var castedRole = VerifyCastingEntity<IAppRole, AppRole>.VerifyObject(role);
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var result = await _roleRepository.CreateAsync(role, CancellationToken.None);
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Index");
-                }
-                foreach (var error  in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                return View(role);
             }
-            return View(role);
+            var result = await _roleRepository.CreateAsync(role, CancellationToken.None);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+            return View(result);
         }
 
         // GET: RoleAdmin/Edit/string_guid
