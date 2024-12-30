@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DessertApp.Infraestructure.UserServices
 {
-    public class AppUserStore : IUserStore<AppUser>, IUserEmailStore<AppUser>, IUserPasswordStore<AppUser>, IUserRoleStore<AppUser>
+    public class AppUserStore : IUserStore<AppUser>, IUserEmailStore<AppUser>, IUserPasswordStore<AppUser>, IUserRoleStore<AppUser>, IUserPhoneNumberStore<AppUser>
     {
         private readonly AppDbContext _context;
 
@@ -136,9 +136,6 @@ namespace DessertApp.Infraestructure.UserServices
             if (userName == null) throw new ArgumentNullException(nameof(userName));
 
             user.UserName = userName;
-
-            //_context.Users.Update(user);
-            //await _context.SaveChangesAsync(cancellationToken);
             return Task.CompletedTask;
         }
 
@@ -243,6 +240,36 @@ namespace DessertApp.Infraestructure.UserServices
                 .Where(ur => ur.r.Name == roleName)
                 .Select(userRole => userRole.ur.UserId)
                 .ToListAsync(cancellationToken);
+        }
+
+        public Task SetPhoneNumberAsync(AppUser user, string? phoneNumber, CancellationToken cancellationToken)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            user.PhoneNumber = phoneNumber;
+            return Task.CompletedTask;
+        }
+
+        public Task<string?> GetPhoneNumberAsync(AppUser user, CancellationToken cancellationToken)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            return Task.FromResult(user.PhoneNumber);
+        }
+
+        public Task<bool> GetPhoneNumberConfirmedAsync(AppUser user, CancellationToken cancellationToken)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            return Task.FromResult(user.PhoneNumberConfirmed);
+        }
+
+        public Task SetPhoneNumberConfirmedAsync(AppUser user, bool confirmed, CancellationToken cancellationToken)
+        {
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            user.PhoneNumberConfirmed = confirmed;
+            return Task.CompletedTask;
         }
     }
 }

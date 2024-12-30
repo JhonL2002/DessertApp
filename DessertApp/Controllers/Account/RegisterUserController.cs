@@ -7,24 +7,22 @@ using System.Text;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using DessertApp.Models.ViewModels;
 using DessertApp.ViewModels;
+using DessertApp.Services.UserManagerServices;
 
 namespace DessertApp.Controllers.Account
 {
     public class RegisterUserController : Controller
     {
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly IUserManagerService<IdentityResult, AppUser, IdentityOptions> _userManagerService;
         private readonly ILogger<RegisterUserController> _logger;
         private readonly IEmailSender _emailSender;
 
         public RegisterUserController(
-            UserManager<AppUser> userManager,
-            SignInManager<AppUser> signInManager,
+            IUserManagerService<IdentityResult, AppUser, IdentityOptions> userManagerService,
             ILogger<RegisterUserController> logger,
             IEmailSender emailSender)
         {
-            _userManager = userManager;
-            _signInManager = signInManager;
+            _userManagerService = userManagerService;
             _logger = logger;
             _emailSender = emailSender;
         }
@@ -33,23 +31,17 @@ namespace DessertApp.Controllers.Account
         {
             returnUrl ??= Url.Content("~/");
 
-            var user = new AppUser
-            {
-                UserName = model.Email,
-                Email = model.Email
-            };
-
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
 
-            var result = await _userManager.CreateAsync(user, model.Password);
+            var (result, user) = await _userManagerService.CreateUserAsync(model.Email, model.Password);
 
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password");
-                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var code = await _userManagerService.GenerateEmailConfirmationTokenAsync(user);
                 var callbackUrl = GenerateConfirmationUrl(user, code, returnUrl);
 
                 try
@@ -62,12 +54,10 @@ namespace DessertApp.Controllers.Account
                     _logger.LogError(ex, "Failed to send email");
                 }
 
-                if (_userManager.Options.SignIn.RequireConfirmedAccount)
+                if (_userManagerService.Options!.SignIn.RequireConfirmedAccount)
                 {
                     return RedirectToAction("RegisterConfirmation", "RegisterUser", new { email = model.Email, returnUrl});
                 }
-
-                await _signInManager.SignInAsync(user, isPersistent: false);
                 return LocalRedirect(returnUrl);
             }
             return View(model);
@@ -81,7 +71,7 @@ namespace DessertApp.Controllers.Account
             }
             returnUrl ??= Url.Content("~/");
 
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManagerService.FindByEmailAsync(email);
             if (user == null)
             {
                 return NotFound($"Unable to load user with email '{email}'.");
@@ -103,14 +93,14 @@ namespace DessertApp.Controllers.Account
                 return RedirectToAction("Index", "Home");
             }
 
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManagerService.FindByIdAsync(userId);
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
-            var result = await _userManager.ConfirmEmailAsync(user, code);
+            var result = await _userManagerService.ConfirmEmailAsync(userId, code);
             confirmEmail.StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
             return View(confirmEmail);
         }

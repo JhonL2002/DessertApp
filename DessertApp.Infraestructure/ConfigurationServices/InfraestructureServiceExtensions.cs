@@ -1,4 +1,5 @@
-﻿using DessertApp.Infraestructure.Data;
+﻿using DessertApp.Infraestructure.AccountServices;
+using DessertApp.Infraestructure.Data;
 using DessertApp.Infraestructure.DataInitializerServices;
 using DessertApp.Infraestructure.EmailServices;
 using DessertApp.Infraestructure.IdentityModels;
@@ -7,6 +8,7 @@ using DessertApp.Infraestructure.ResilienceServices;
 using DessertApp.Infraestructure.RoleServices;
 using DessertApp.Infraestructure.SecretServices;
 using DessertApp.Infraestructure.UserServices;
+using DessertApp.Services.AccountServices;
 using DessertApp.Services.ConfigurationServices;
 using DessertApp.Services.DataInitializerServices;
 using DessertApp.Services.EmailServices;
@@ -14,6 +16,7 @@ using DessertApp.Services.IEmailServices;
 using DessertApp.Services.Repositories;
 using DessertApp.Services.RoleStoreServices;
 using DessertApp.Services.SecretServices;
+using DessertApp.Services.UserManagerServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -97,6 +100,9 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
+            //Add external users manager (implemented Identity from Entity Framework)
+            services.AddScoped<IUserManagerService<IdentityResult, AppUser, IdentityOptions>, UserManagerService>();
+
             //Services for repositories
             services.AddScoped<IGenericRepository<AppRole, IdentityResult, string>, RoleRepository>();
             return services;
@@ -112,6 +118,10 @@ namespace DessertApp.Infraestructure.ConfigurationServices
 
             //Add external key vault services (implemented Azure Key Vault)
             services.AddTransient<IManageSecrets, ManageSecrets>();
+
+            //Add external authentication services (implemented Identity from Entity Framework)
+            services.AddScoped<IAuthenticationService<SignInResult, IdentityResult>, AuthenticationService>();
+
             return services;
         }
 
