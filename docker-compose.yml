@@ -1,6 +1,6 @@
 services:
   dessertapp:
-    container_name: dessertapp
+    container_name: dessertapp-development
     image: ${DOCKER_REGISTRY-}dessertapp
     build:
       context: .

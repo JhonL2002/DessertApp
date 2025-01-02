@@ -12,3 +12,4 @@ services:
     volumes:
       - "/c/Users/lordl/AppData/Roaming/Microsoft/UserSecrets/509ac4a2-b87d-4da3-be58-c4f80f3a659c/secrets.json:/app/secrets.json"
       - "/c/Users/lordl/.aspnet/https:/https:ro"
+      - "/c/Users/lordl/.azure:/root/.azure:ro"
