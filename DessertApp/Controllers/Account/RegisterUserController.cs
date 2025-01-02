@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using System.Text.Encodings.Web;
 using System.Text;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using DessertApp.Models.ViewModels;
 using DessertApp.ViewModels;
 using DessertApp.Services.UserManagerServices;
+using DessertApp.Services.EmailServices;
 
 namespace DessertApp.Controllers.Account
 {
@@ -15,16 +14,17 @@ namespace DessertApp.Controllers.Account
     {
         private readonly IUserManagerService<IdentityResult, AppUser, IdentityOptions> _userManagerService;
         private readonly ILogger<RegisterUserController> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailConfirmationService<AppUser> _emailConfirmationService;
 
         public RegisterUserController(
             IUserManagerService<IdentityResult, AppUser, IdentityOptions> userManagerService,
             ILogger<RegisterUserController> logger,
-            IEmailSender emailSender)
+            IEmailConfirmationService<AppUser> emailConfirmationService
+            )
         {
             _userManagerService = userManagerService;
             _logger = logger;
-            _emailSender = emailSender;
+            _emailConfirmationService = emailConfirmationService;
         }
 
         public async Task<IActionResult> Register(RegisterVM model, string returnUrl = null!)
@@ -41,13 +41,11 @@ namespace DessertApp.Controllers.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password");
-                var code = await _userManagerService.GenerateEmailConfirmationTokenAsync(user);
-                var callbackUrl = GenerateConfirmationUrl(user, code, returnUrl);
+                var callbackUrl = _emailConfirmationService.GenerateConfirmationUrlAsync(user, returnUrl);
 
                 try
                 {
-                    await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                     await _emailConfirmationService.SendConfirmationEmailAsync(model.Email, await callbackUrl);
                 }
                 catch (Exception ex)
                 {
@@ -103,27 +101,6 @@ namespace DessertApp.Controllers.Account
             var result = await _userManagerService.ConfirmEmailAsync(userId, code);
             confirmEmail.StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
             return View(confirmEmail);
-        }
-
-        private string GenerateConfirmationUrl(AppUser user, string code, string returnUrl)
-        {
-            try
-            {
-                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-
-                return Url.Action(
-                    action: "ConfirmEmail",
-                    controller: "RegisterUser",
-                    values: new { userId = user.Id, code, returnUrl },
-                    protocol: Request.Scheme
-                )!;
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"An error ocurred, see details here: {ex}");
-                return "";
-            }
         }
     }
 }
