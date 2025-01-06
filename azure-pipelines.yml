@@ -10,8 +10,31 @@ variables:
   resourceGroupName: 'DessertApp'
 
 stages:
+  - stage: BuildAndPush
+    displayName: 'Build and Push Docker Image'
+    jobs:
+      - job: Build
+        displayName: 'Build and Push Docker Image'
+        pool:
+          name: 'WindowsPrivateAgent'
+        steps:
+          - task: DockerCompose@1
+            displayName: 'Build Docker Image'
+            inputs:
+              dockerComposeFile: '**/docker-compose.prod.yml'
+              action: 'Build services'
+              additionalImageTags: $(tag)
+
+          - task: DockerCompose@1
+            displayName: 'Push Docker Image to Docker Hub'
+            inputs:
+              dockerComposeFile: '**/docker-compose.prod.yml'
+              action: 'Push services'
+              additionalImageTags: $(tag)
+
   - stage: Deploy
     displayName: 'Deploy to Azure App Service'
+    dependsOn: BuildAndPush
     jobs:
       - job: Deploy
         displayName: 'Deploy to App Service'
