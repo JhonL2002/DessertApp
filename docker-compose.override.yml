@@ -3,12 +3,11 @@ services:
     environment:
       # Configure self signed certificate to use https in Docker, use an .env file to save passwords and sensitive configurations
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
     ports:
-      - 8080:8080 # HTTP
-      - 8081:8081 # HTTPS
+      - "8080:8080"
+      - "443:443"
     volumes:
       - "/c/Users/lordl/AppData/Roaming/Microsoft/UserSecrets/509ac4a2-b87d-4da3-be58-c4f80f3a659c/secrets.json:/app/secrets.json"
       - "/c/Users/lordl/.aspnet/https:/https:ro"
