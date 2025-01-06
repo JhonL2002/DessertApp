@@ -1,12 +1,24 @@
+using Azure.Identity;
 using DessertApp.Infraestructure.ConfigurationServices;
 using DessertApp.Infraestructure.Data;
-using DessertApp.Services.DataInitializerServices;
-using DessertApp.Services.SecretServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Add configuration sources based on environment
 var environment = builder.Environment.EnvironmentName;
+
+if (environment == "Development")
+{
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(443, listenOptions =>
+        {
+            listenOptions.UseHttps();
+        });
+        options.ListenAnyIP(8080);
+    });
+}
+
 
 if (environment == "Development")
 {

@@ -1,7 +1,9 @@
 ﻿using DessertApp.Services.ConfigurationServices;
 using DessertApp.Services.EmailServices;
 using DessertApp.Services.IEmailServices;
+using DessertApp.Services.SecretServices;
 using Mailjet.Client;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -12,24 +14,47 @@ namespace DessertApp.Infraestructure.EmailServices
     public class EmailSender : IEmailSender
     {
         private readonly ILogger<EmailSender> _logger;
-        private readonly MailjetClient _mailjetClient;
+        private readonly IMailjetClientFactory<MailjetClient,MailjetResponse,MailjetRequest> _mailjetClient;
         private readonly IEmailRequestBuilder<MailjetRequest> _emailRequestBuilder;
+        private readonly IWebHostEnvironment _environment;
+        private readonly IManageSecrets _manageSecrets;
+
         public string _fromEmail;
+
+
         public EmailSender(
             ILogger<EmailSender> logger,
             IEmailRequestBuilder<MailjetRequest> emailRequestBuilder,
             IConfigurationFactory<IConfiguration> configurationFactory,
-            IMailjetClientFactory<MailjetClient> mailjetClient)
+            IMailjetClientFactory<MailjetClient, MailjetResponse, MailjetRequest> mailjetClient,
+            IWebHostEnvironment environment,
+            IManageSecrets manageSecrets)
         {
             _logger = logger;
             _emailRequestBuilder = emailRequestBuilder;
-            _mailjetClient = mailjetClient.CreateClient() ?? throw new InvalidOperationException("No se pudo crear MailjetClient."); ;
+            _mailjetClient = mailjetClient;
+            _environment = environment;
+            _manageSecrets = manageSecrets;
 
             //Additional configuration to create a custom configuration to read secrets
             var configuration = configurationFactory.CreateConfiguration();
-            _fromEmail = configuration["EmailSenderConfig:FromEmail"]! ?? throw new ArgumentNullException(nameof(_fromEmail), "El valor de 'FromEmail' no puede ser nulo.");
+
+            if (_environment.EnvironmentName == "Development")
+            {
+                _fromEmail = configuration["EmailSenderConfig:FromEmail"]!;
+            }
+            else
+            {
+                SetFromEmailAsync().Wait();
+            }
             
         }
+
+        private async Task SetFromEmailAsync()
+        {
+            _fromEmail = await _manageSecrets.GetSecretsAsync("dessertkeyvault", "FROMEMAIL");
+        }
+
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             try
@@ -44,8 +69,7 @@ namespace DessertApp.Infraestructure.EmailServices
                     .Build();
 
                 //Send the email to recipient
-                var response = await _mailjetClient.PostAsync(request);
-
+                var response = await _mailjetClient.SendEmailAsync(request);
                 //Show logs for response result
                 if (response.IsSuccessStatusCode)
                 {
