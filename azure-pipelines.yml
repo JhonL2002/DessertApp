@@ -8,10 +8,44 @@ variables:
   azureSubscription: 'Azure-Subscription'
   appServiceName: 'dessert-app-jhonl2002'
   resourceGroupName: 'DessertApp'
+  dockerComposePath: C:\docker-compose
+  dockerComposeProjectName: 'dessertapp-prod'
 
 stages:
+  - stage: BuildAndPush
+    displayName: 'Build and Push Docker Image'
+    jobs:
+      - job: Build
+        displayName: 'Build and Push Docker Image'
+        pool:
+          name: 'WindowsPrivateAgent'
+        steps:
+          - powershell: |
+              mkdir -f $(dockerComposePath)
+              # GitHub ahora requiere TLS1.2. In PowerShell, run the following
+              [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+              Start-BitsTransfer -Source "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-windows-x86_64.exe" -Destination $(dockerComposePath)\docker-compose.exe
+            displayName: 'Download Docker Compose v1'
+          - task: DockerCompose@1
+            displayName: 'Build Docker Image using Docker Compose v1'
+            inputs:
+              dockerComposeFile: '**/docker-compose.prod.yml'
+              action: 'Build services'
+              additionalImageTags: $(tag)
+              dockerComposePath: $(dockerComposePath)\docker-compose.exe
+              projectName: $(dockerComposeProjectName)
+          - task: DockerCompose@1
+            displayName: 'Push Docker Image to Docker Hub'
+            inputs:
+              dockerComposeFile: '**/docker-compose.prod.yml'
+              action: 'Push services'
+              additionalImageTags: $(tag)
+              dockerComposePath: $(dockerComposePath)\docker-compose.exe
+              projectName: $(dockerComposeProjectName)
+
   - stage: Deploy
     displayName: 'Deploy to Azure App Service'
+    dependsOn: BuildAndPush
     jobs:
       - job: Deploy
         displayName: 'Deploy to App Service'
