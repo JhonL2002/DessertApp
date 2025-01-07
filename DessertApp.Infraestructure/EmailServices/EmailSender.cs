@@ -17,7 +17,7 @@ namespace DessertApp.Infraestructure.EmailServices
         private readonly IMailjetClientFactory<MailjetClient,MailjetResponse,MailjetRequest> _mailjetClient;
         private readonly IEmailRequestBuilder<MailjetRequest> _emailRequestBuilder;
         private readonly IWebHostEnvironment _environment;
-        private readonly IManageSecrets _manageSecrets;
+        private readonly IManageSecrets _secretManager;
 
         public string _fromEmail;
 
@@ -28,31 +28,28 @@ namespace DessertApp.Infraestructure.EmailServices
             IConfigurationFactory<IConfiguration> configurationFactory,
             IMailjetClientFactory<MailjetClient, MailjetResponse, MailjetRequest> mailjetClient,
             IWebHostEnvironment environment,
-            IManageSecrets manageSecrets)
+            IManageSecrets secretManager)
         {
             _logger = logger;
             _emailRequestBuilder = emailRequestBuilder;
             _mailjetClient = mailjetClient;
             _environment = environment;
-            _manageSecrets = manageSecrets;
-
-            //Additional configuration to create a custom configuration to read secrets
-            var configuration = configurationFactory.CreateConfiguration();
+            _secretManager = secretManager;
 
             if (_environment.EnvironmentName == "Development")
             {
+                //Additional configuration to create a custom configuration to read secrets (use it in development scenarios)
+                //Read the FromEmail property to send email
+                var configuration = configurationFactory.CreateConfiguration();
                 _fromEmail = configuration["EmailSenderConfig:FromEmail"]!;
             }
             else
             {
-                SetFromEmailAsync().Wait();
+                //Get the secret from secrets manager
+                //Read the FROMEMAIL property to send email
+                _secretManager.GetSecretsAsync("dessertkeyvault", "FROMEMAIL");
             }
             
-        }
-
-        private async Task SetFromEmailAsync()
-        {
-            _fromEmail = await _manageSecrets.GetSecretsAsync("dessertkeyvault", "FROMEMAIL");
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
