@@ -34,7 +34,7 @@ namespace DessertApp.Infraestructure.EmailServices
 
             string baseUrl = _environment.IsDevelopment()
                 ? "https://localhost:7282/RegisterUser/ConfirmEmail"
-                : "https://dessert-app-jhonl2002-e3bnekfderdbejbr.brazilsouth-01.azurewebsites.net";
+                : "https://dessert-app-jhonl2002-e3bnekfderdbejbr.brazilsouth-01.azurewebsites.net/";
 
             return UrlHelperBuilder.BuildConfirmationUrl(baseUrl, user.Id, encodedCode, returnUrl);
         }

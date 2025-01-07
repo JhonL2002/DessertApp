@@ -47,7 +47,7 @@ namespace DessertApp.Infraestructure.EmailServices
             {
                 //Get the secret from secrets manager
                 //Read the FROMEMAIL property to send email
-                _secretManager.GetSecretsAsync("dessertkeyvault", "FROMEMAIL");
+                SetFromEmailFromVaultAsync().Wait();
             }
             
         }
@@ -82,6 +82,12 @@ namespace DessertApp.Infraestructure.EmailServices
                 _logger.LogError($"Error sending email: {ex.Message}");
                 throw;
             }
+
+        }
+
+        private async Task SetFromEmailFromVaultAsync()
+        {
+            _fromEmail = await _secretManager.GetSecretsAsync("dessertkeyvault", "FROMEMAIL");
 
         }
     }
