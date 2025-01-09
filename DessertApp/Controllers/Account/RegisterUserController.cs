@@ -15,16 +15,19 @@ namespace DessertApp.Controllers.Account
         private readonly IUserManagerService<IdentityResult, AppUser, IdentityOptions> _userManagerService;
         private readonly ILogger<RegisterUserController> _logger;
         private readonly IEmailConfirmationService<AppUser> _emailConfirmationService;
+        private readonly IUserRoleStore<AppUser> _userRoleStore;
 
         public RegisterUserController(
             IUserManagerService<IdentityResult, AppUser, IdentityOptions> userManagerService,
             ILogger<RegisterUserController> logger,
-            IEmailConfirmationService<AppUser> emailConfirmationService
+            IEmailConfirmationService<AppUser> emailConfirmationService,
+            IUserRoleStore<AppUser> userRoleStore
             )
         {
             _userManagerService = userManagerService;
             _logger = logger;
             _emailConfirmationService = emailConfirmationService;
+            _userRoleStore = userRoleStore;
         }
 
         public async Task<IActionResult> Register(RegisterVM model, string returnUrl = null!)
@@ -37,6 +40,7 @@ namespace DessertApp.Controllers.Account
             }
 
             var (result, user) = await _userManagerService.CreateUserAsync(model.Email, model.Password);
+            await _userRoleStore.AddToRoleAsync(user, "User", CancellationToken.None);
 
             if (result.Succeeded)
             {

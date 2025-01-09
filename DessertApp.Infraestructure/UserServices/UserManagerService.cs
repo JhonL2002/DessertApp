@@ -2,6 +2,7 @@
 using DessertApp.Services.UserManagerServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 namespace DessertApp.Infraestructure.UserServices
 {
@@ -48,6 +49,17 @@ namespace DessertApp.Infraestructure.UserServices
         {
             if (user == null) return null!;
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
+
+        public async Task<AppUser> GetUserAsync(ClaimsPrincipal claimsPrincipal)
+        {
+            if (claimsPrincipal  == null) return null!;
+            var id = _userManager.GetUserId(claimsPrincipal);
+            if (id != null)
+            {
+                return await _userManager.FindByIdAsync(id);
+            }
+            return null!;
         }
     }
 }

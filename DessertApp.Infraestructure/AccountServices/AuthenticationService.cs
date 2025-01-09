@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DessertApp.Infraestructure.AccountServices
 {
-    public class AuthenticationService : IAuthenticationService<SignInResult, IdentityResult>
+    public class AuthenticationService : IAuthenticationService<SignInResult, IdentityResult, AppUser>
     {
         private readonly SignInManager<AppUser> _signInManager;
         private readonly UserManager<AppUser> _userManager;
@@ -26,6 +26,11 @@ namespace DessertApp.Infraestructure.AccountServices
             if (user == null) return IdentityResult.Failed();
 
             return await _userManager.ConfirmEmailAsync(user, code);
+        }
+
+        public async Task RefreshSignInAsync(AppUser user)
+        {
+            await _signInManager.RefreshSignInAsync(user);
         }
 
         public async Task<IdentityResult> RegisterAsync(string email, string password)

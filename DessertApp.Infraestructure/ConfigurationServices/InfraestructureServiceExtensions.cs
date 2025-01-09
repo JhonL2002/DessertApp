@@ -88,6 +88,8 @@ namespace DessertApp.Infraestructure.ConfigurationServices
 
             //Application services
             services.AddScoped<IUserStore<AppUser>, AppUserStore>();
+            services.AddScoped<IUserRoleStore<AppUser>, AppUserStore>();
+            services.AddScoped<IUserPhoneNumberStore<AppUser>, AppUserStore>();
             services.AddScoped<IRoleStore<AppRole>, AppRoleStore>();
             services.AddScoped<IExtendedRoleStore<AppRole>, AppRoleStore>();
             services.AddTransient<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
@@ -121,7 +123,7 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddTransient<IManageSecrets, ManageSecrets>();
 
             //Add external authentication services (implemented Identity from Entity Framework)
-            services.AddScoped<IAuthenticationService<SignInResult, IdentityResult>, AuthenticationService>();
+            services.AddScoped<IAuthenticationService<SignInResult, IdentityResult, AppUser>, AuthenticationService>();
 
             return services;
         }

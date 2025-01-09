@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,6 +14,7 @@ namespace DessertApp.Services.UserManagerServices
         Task<T?> FindByEmailAsync(string email);
         Task<T?> FindByIdAsync(string userId);
         Task<string> GenerateEmailConfirmationTokenAsync(T user);
+        Task<T> GetUserAsync(ClaimsPrincipal claimsPrincipal);
         TOptions? Options { get; set; }
     }
 }

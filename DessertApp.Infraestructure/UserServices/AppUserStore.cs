@@ -2,16 +2,21 @@
 using DessertApp.Infraestructure.IdentityModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace DessertApp.Infraestructure.UserServices
 {
     public class AppUserStore : IUserStore<AppUser>, IUserEmailStore<AppUser>, IUserPasswordStore<AppUser>, IUserRoleStore<AppUser>, IUserPhoneNumberStore<AppUser>
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<AppUserStore> _logger;
 
-        public AppUserStore(AppDbContext context)
+        public AppUserStore(
+            AppDbContext context,
+            ILogger<AppUserStore> logger)
         {
             _context = context;
+            _logger = logger;
         }
         public async Task<IdentityResult> CreateAsync(AppUser user, CancellationToken cancellationToken)
         {
@@ -193,6 +198,8 @@ namespace DessertApp.Infraestructure.UserServices
 
             await _context.UserRoles.AddAsync(userRole, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("User added to role succesfully!");
         }
 
         public async Task RemoveFromRoleAsync(AppUser user, string roleName, CancellationToken cancellationToken)
