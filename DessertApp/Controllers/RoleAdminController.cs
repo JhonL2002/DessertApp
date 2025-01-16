@@ -9,8 +9,8 @@ namespace DessertApp.Controllers
     [Authorize(Roles = "Admin")]
     public class RoleAdminController : Controller
     {
-        private readonly IGenericRepository<AppRole, IdentityResult,string> _roleRepository;
-        public RoleAdminController(IGenericRepository<AppRole, IdentityResult,string> roleRepository)
+        private readonly IGenericIdentityRepository<AppRole, IdentityResult,string> _roleRepository;
+        public RoleAdminController(IGenericIdentityRepository<AppRole, IdentityResult,string> roleRepository)
         {
             _roleRepository = roleRepository;
         }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace DessertApp.Infraestructure.Repositories
 {
-    public class RoleRepository : IGenericRepository<AppRole, IdentityResult, string>
+    public class RoleRepository : IGenericIdentityRepository<AppRole, IdentityResult, string>
     {
         private readonly IRoleStore<AppRole> _roleStore;
         private readonly IExtendedRoleStore<AppRole> _extendedRoleStore;
