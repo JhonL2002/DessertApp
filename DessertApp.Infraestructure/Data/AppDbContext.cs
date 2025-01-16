@@ -80,22 +80,19 @@ namespace DessertApp.Infraestructure.Data
 
                 entity.Property(i => i.IsAvailable)
                     .IsRequired()
-                    .HasDefaultValue(true);
+                    .HasDefaultValue(false);
 
                 entity.Property(i => i.CostPerUnit)
-                    .IsRequired()
                     .HasPrecision(18, 2);
 
                 entity.Property(i => i.OrderingCost)
-                    .IsRequired()
                     .HasPrecision(18, 2);
 
                 entity.Property(i => i.MonthlyHoldingCostRate)
-                    .IsRequired()
                     .HasPrecision(18, 4);
 
                 entity.Property(i => i.AnnualDemand)
-                    .IsRequired();
+                    .HasPrecision(18, 4);
 
                 // Ignore calculated properties
                 entity.Ignore(i => i.AnnualHoldingCost);
