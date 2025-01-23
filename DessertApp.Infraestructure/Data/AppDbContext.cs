@@ -20,6 +20,8 @@ namespace DessertApp.Infraestructure.Data
         public DbSet<DessertIngredient> DessertIngredients { get; set; }
         public DbSet<Sale> Sales { get; set; }
         public DbSet<SaleDetail> SaleDetails { get; set; }
+        public DbSet<MeasurementUnit> Units { get; set; }
+        public DbSet<IngredientUnit> IngredientUnits { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -75,29 +77,43 @@ namespace DessertApp.Infraestructure.Data
                     .HasMaxLength(100);
 
                 entity.Property(i => i.Stock)
-                    .IsRequired()
                     .HasDefaultValue(0);
 
                 entity.Property(i => i.IsAvailable)
                     .IsRequired()
                     .HasDefaultValue(false);
 
-                entity.Property(i => i.CostPerUnit)
+                entity.HasOne(i => i.IngredientUnit)
+                    .WithOne(i => i.Ingredient)
+                    .HasForeignKey<IngredientUnit>(iu => iu.IngredientId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            //IngredientUnit
+            builder.Entity<IngredientUnit>(entity =>
+            {
+                entity.HasKey(iu => iu.Id);
+
+                entity.HasOne(iu => iu.Unit)
+                    .WithMany()
+                    .HasForeignKey(iu => iu.UnitId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(iu => iu.Ingredient)
+                    .WithOne(i => i.IngredientUnit)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(iu => iu.CostPerUnit)
                     .HasPrecision(18, 2);
 
-                entity.Property(i => i.OrderingCost)
+                entity.Property(iu => iu.ItemsPerUnit)
+                    .HasDefaultValue(0);
+
+                entity.Property(iu => iu.MonthlyHoldingCostRate)
                     .HasPrecision(18, 2);
 
-                entity.Property(i => i.MonthlyHoldingCostRate)
-                    .HasPrecision(18, 4);
-
-                entity.Property(i => i.AnnualDemand)
-                    .HasPrecision(18, 4);
-
-                // Ignore calculated properties
-                entity.Ignore(i => i.AnnualHoldingCost);
-                entity.Ignore(i => i.EconomicOrderQuantity);
-                entity.Ignore(i => i.PeriodicOrderQuantity);
+                entity.Property(iu => iu.OrderingCost)
+                    .HasPrecision(18, 2);
             });
 
             //DessertIngredient
@@ -176,9 +192,16 @@ namespace DessertApp.Infraestructure.Data
             //MeasurementUnit
             builder.Entity<MeasurementUnit>(entity =>
             {
+                entity.HasKey(mu => mu.Id);
+
                 entity.Property(mu => mu.Name)
                 .IsRequired()
                 .HasMaxLength(50);
+
+                entity.HasData(new MeasurementUnit
+                {
+                    Id = 1, Name = "Generic Unit"
+                });
             });
 
             base.OnModelCreating(builder);

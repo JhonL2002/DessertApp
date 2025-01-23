@@ -4,6 +4,7 @@ using DessertApp.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DessertApp.Infraestructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250117214120_AddOneWithManyRelationshipIntoIngredientUnitEntity")]
+    partial class AddOneWithManyRelationshipIntoIngredientUnitEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,6 +229,7 @@ namespace DessertApp.Infraestructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("Stock")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
@@ -254,9 +258,7 @@ namespace DessertApp.Infraestructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("ItemsPerUnit")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                        .HasColumnType("int");
 
                     b.Property<decimal?>("MonthlyHoldingCostRate")
                         .HasPrecision(18, 2)
@@ -271,12 +273,11 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IngredientId")
-                        .IsUnique();
+                    b.HasIndex("IngredientId");
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("IngredientUnits");
+                    b.ToTable("IngredientUnit");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.MeasurementUnit", b =>
@@ -294,14 +295,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Units");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Generic Unit"
-                        });
+                    b.ToTable("MeasurementUnit");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.Sale", b =>
@@ -506,8 +500,8 @@ namespace DessertApp.Infraestructure.Migrations
             modelBuilder.Entity("DessertApp.Models.Entities.IngredientUnit", b =>
                 {
                     b.HasOne("DessertApp.Models.Entities.Ingredient", "Ingredient")
-                        .WithOne("IngredientUnit")
-                        .HasForeignKey("DessertApp.Models.Entities.IngredientUnit", "IngredientId")
+                        .WithMany("Units")
+                        .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -599,8 +593,7 @@ namespace DessertApp.Infraestructure.Migrations
 
             modelBuilder.Entity("DessertApp.Models.Entities.Ingredient", b =>
                 {
-                    b.Navigation("IngredientUnit")
-                        .IsRequired();
+                    b.Navigation("Units");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.Sale", b =>

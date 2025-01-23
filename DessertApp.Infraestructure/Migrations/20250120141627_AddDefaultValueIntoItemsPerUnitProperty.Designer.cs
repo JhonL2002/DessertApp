@@ -4,6 +4,7 @@ using DessertApp.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DessertApp.Infraestructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250120141627_AddDefaultValueIntoItemsPerUnitProperty")]
+    partial class AddDefaultValueIntoItemsPerUnitProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,6 +229,7 @@ namespace DessertApp.Infraestructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("Stock")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasDefaultValue(0);
@@ -271,8 +275,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IngredientId")
-                        .IsUnique();
+                    b.HasIndex("IngredientId");
 
                     b.HasIndex("UnitId");
 
@@ -506,8 +509,8 @@ namespace DessertApp.Infraestructure.Migrations
             modelBuilder.Entity("DessertApp.Models.Entities.IngredientUnit", b =>
                 {
                     b.HasOne("DessertApp.Models.Entities.Ingredient", "Ingredient")
-                        .WithOne("IngredientUnit")
-                        .HasForeignKey("DessertApp.Models.Entities.IngredientUnit", "IngredientId")
+                        .WithMany("IngredientUnits")
+                        .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -599,8 +602,7 @@ namespace DessertApp.Infraestructure.Migrations
 
             modelBuilder.Entity("DessertApp.Models.Entities.Ingredient", b =>
                 {
-                    b.Navigation("IngredientUnit")
-                        .IsRequired();
+                    b.Navigation("IngredientUnits");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.Sale", b =>
