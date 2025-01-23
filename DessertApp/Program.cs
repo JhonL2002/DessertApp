@@ -5,6 +5,9 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//Configure the global culture (en-US)
+CultureConfigurator.ConfigureCulture();
+
 //Add configuration sources based on environment
 var environment = builder.Environment.EnvironmentName;
 
@@ -23,6 +26,7 @@ if (environment == "Development")
         .SetBasePath(Directory.GetCurrentDirectory())
         .AddUserSecrets<AppDbContext>();
 }
+
 //Configure Serilog
 var logger = new LoggerConfiguration()
     .ReadFrom

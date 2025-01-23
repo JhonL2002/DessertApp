@@ -24,9 +24,9 @@
         </thead>
         <tbody>
             <tr>
-                <td>@Model.IngredientUnit!.ItemsPerUnit</td>
-                <td>@Model.IngredientUnit.CostPerUnit</td>
-                <td>@Model.IngredientUnit.OrderingCost</td>
+                <td>@Model.IngredientUnit!.ItemsPerUnit.ToString("N0")</td>
+                <td>$ @Model.IngredientUnit!.CostPerUnit?.ToString("N2")</td>
+                <td>$ @Model.IngredientUnit!.OrderingCost?.ToString("N2")</td>
             </tr>
         </tbody>
     </table>

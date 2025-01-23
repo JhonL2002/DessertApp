@@ -1,5 +1,4 @@
-﻿using DessertApp.Models.Entities;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
 namespace DessertApp.ViewModels.DomainVM
