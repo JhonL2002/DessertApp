@@ -7,6 +7,7 @@ using DessertApp.Infraestructure.Repositories;
 using DessertApp.Infraestructure.ResilienceServices;
 using DessertApp.Infraestructure.RoleServices;
 using DessertApp.Infraestructure.SecretServices;
+using DessertApp.Infraestructure.UnitOfWorkServices;
 using DessertApp.Infraestructure.UserServices;
 using DessertApp.Services.AccountServices;
 using DessertApp.Services.ConfigurationServices;
@@ -14,8 +15,10 @@ using DessertApp.Services.DataInitializerServices;
 using DessertApp.Services.EmailServices;
 using DessertApp.Services.IEmailServices;
 using DessertApp.Services.Repositories;
+using DessertApp.Services.RepositoriesServices;
 using DessertApp.Services.RoleStoreServices;
 using DessertApp.Services.SecretServices;
+using DessertApp.Services.UnitOfWorkServices;
 using DessertApp.Services.UserManagerServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
@@ -24,18 +27,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace DessertApp.Infraestructure.ConfigurationServices
 {
     public static class InfraestructureServiceExtensions
     {
-        public static IServiceCollection AddInfraestructureServices(
+        public static IServiceCollection AddDatabaseServices(
             this IServiceCollection services,
             IConfiguration configuration,
             string environment)
         {
-            //External services registration
-            services.AddTransient<IManageSecrets, ManageSecrets>();
 
             //Configure resilience and database connection
             services.AddDbContext<AppDbContext>((provider ,options) =>
@@ -69,21 +71,12 @@ namespace DessertApp.Infraestructure.ConfigurationServices
                 }
                 
             });
-
-            //Add filters to logging services
-            services.AddLogging(logging =>
-            {
-                logging.ClearProviders();
-                logging.AddConsole();
-                logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Connection", LogLevel.Warning);
-                logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", LogLevel.Warning);
-            });
             return services;
         }
 
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddIdentityServices(this IServiceCollection services)
         {
-            //Initialize Data services
+            //Initialize Data services (Initialize services for AppRole)
             services.AddScoped<IDataInitializer, DataInitializer>();
 
             //Application services
@@ -92,7 +85,6 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddScoped<IUserPhoneNumberStore<AppUser>, AppUserStore>();
             services.AddScoped<IRoleStore<AppRole>, AppRoleStore>();
             services.AddScoped<IExtendedRoleStore<AppRole>, AppRoleStore>();
-            services.AddTransient<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
 
             //Add identity services (You need to add the implemented classes)
             services.AddIdentity<AppUser, AppRole>(options =>
@@ -105,8 +97,20 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             //Add external users manager (implemented Identity from Entity Framework)
             services.AddScoped<IUserManagerService<IdentityResult, AppUser, IdentityOptions>, UserManagerService>();
 
+            //Add external authentication services (implemented Identity from Entity Framework)
+            services.AddScoped<IAuthenticationService<SignInResult, IdentityResult, AppUser>, AuthenticationService>();
+            return services;
+        }
+
+        public static IServiceCollection AddRepositoriesServices(this IServiceCollection services)
+        {
             //Services for repositories
-            services.AddScoped<IGenericRepository<AppRole, IdentityResult, string>, RoleRepository>();
+            services.AddScoped<IGenericIdentityRepository<AppRole, IdentityResult, string>, RoleRepository>();
+            services.AddScoped(typeof(IDomainGenericRepository<,>), typeof(DomainPersistentRepository<,>));
+
+            //UnitOfWork services
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             return services;
         }
 
@@ -122,9 +126,12 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             //Add external key vault services (implemented Azure Key Vault)
             services.AddTransient<IManageSecrets, ManageSecrets>();
 
-            //Add external authentication services (implemented Identity from Entity Framework)
-            services.AddScoped<IAuthenticationService<SignInResult, IdentityResult, AppUser>, AuthenticationService>();
+            return services;
+        }
 
+        public static IServiceCollection AddConfigurationServices(this IServiceCollection services)
+        {
+            services.AddTransient<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
             return services;
         }
 
