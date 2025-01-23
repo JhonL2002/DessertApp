@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DessertApp.Tests", "Dessert
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{EC8AC7B7-5F8D-42B1-838D-E779387FE7A2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DessertApp.Application", "DessertApp.Application\DessertApp.Application.csproj", "{DB2A7FD5-C408-4278-B622-FC0284761DBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{EC8AC7B7-5F8D-42B1-838D-E779387FE7A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC8AC7B7-5F8D-42B1-838D-E779387FE7A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC8AC7B7-5F8D-42B1-838D-E779387FE7A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB2A7FD5-C408-4278-B622-FC0284761DBB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB2A7FD5-C408-4278-B622-FC0284761DBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB2A7FD5-C408-4278-B622-FC0284761DBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB2A7FD5-C408-4278-B622-FC0284761DBB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

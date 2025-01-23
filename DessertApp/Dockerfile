@@ -10,6 +10,7 @@ COPY ["DessertApp/DessertApp.csproj", "DessertApp/"]
 COPY ["DessertApp.Infraestructure/DessertApp.Infraestructure.csproj", "DessertApp.Infraestructure/"]
 COPY ["DessertApp.Models/DessertApp.Models.csproj", "DessertApp.Models/"]
 COPY ["DessertApp.Services/DessertApp.Services.csproj", "DessertApp.Services/"]
+COPY ["DessertApp.Application/DessertApp.Application.csproj", "DessertApp.Application/"]
 RUN dotnet restore "./DessertApp/DessertApp.csproj"
 COPY . .
 WORKDIR "/src/DessertApp"
