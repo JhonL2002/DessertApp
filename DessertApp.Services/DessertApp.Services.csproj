@@ -7,4 +7,8 @@
     <UserSecretsId>f03464b8-09bc-401c-b04b-11e3d84e215d</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DessertApp.Models\DessertApp.Models.csproj" />
+  </ItemGroup>
+
 </Project>

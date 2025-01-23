@@ -1,6 +1,5 @@
-using DessertApp.Models;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace DessertApp.Controllers
 {
@@ -26,7 +25,12 @@ namespace DessertApp.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var exceptionDetails = HttpContext.Features.Get<IExceptionHandlerFeature>();
+            if (exceptionDetails != null)
+            {
+                _logger.LogError($"Catched exception: {exceptionDetails.Error.Message}");
+            }
+            return View();
         }
     }
 }

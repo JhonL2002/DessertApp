@@ -1,0 +1,17 @@
+﻿@model DessertApp.Models.Entities.Ingredient
+
+@{
+    ViewData["Title"] = "Delete Ingredient";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>Are you sure you want to delete the ingredient <strong>@Model.Name</strong>?</p>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+
+<a href="@Url.Action("Index", "IngredientEntity")" class="btn btn-secondary">Cancel</a>
+

@@ -1,0 +1,80 @@
+﻿@using DessertApp.ViewModels.DomainVM
+@model IngredientEditVM
+
+@{
+    ViewData["Title"] = "Edit Ingredient";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" name="Id" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name">Name</label>
+        <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Stock">Stock</label>
+        <input type="number" class="form-control" id="Stock" name="Stock" asp-for="Stock" />
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+
+    <h2>Ingredient Units</h2>
+    <div class="form-group">
+        <div class="card mb-3">
+            <div class="card-body">
+            
+                <!-- Campo oculto para el ID de la unidad -->
+                <input type="hidden" name="IngredientUnitVM.Id" asp-for="IngredientUnitVM.Id" />
+
+                <select asp-for="IngredientUnitVM.SelectedUnitId" class="form-control" asp-items="@Model.AvailableUnits"></select>
+
+                <div class="form-group">
+                    <label>Items Per Unit</label>
+                    <input type="number" class="form-control" 
+                       name="IngredientUnitVM.ItemsPerUnit" 
+                       asp-for="IngredientUnitVM.ItemsPerUnit" />
+                    <span asp-validation-for="IngredientUnitVM.ItemsPerUnit" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>Cost Per Unit</label>
+                    <input class="form-control" 
+                       name="IngredientUnitVM.CostPerUnit" 
+                       asp-for="IngredientUnitVM.CostPerUnit"
+                               placeholder="Enter a value (e.g. 10,5)" />
+                    <span asp-validation-for="IngredientUnitVM.CostPerUnit" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>Ordering Cost</label>
+                    <input class="form-control" 
+                       name="IngredientUnitVM.OrderingCost" 
+                       asp-for="IngredientUnitVM.OrderingCost"
+                               placeholder="Enter a value (e.g. 10,5)" />
+                    <span asp-validation-for="IngredientUnitVM.OrderingCost" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>Monthly Holding Cost Rate</label>
+                    <input class="form-control" 
+                       name="IngredientUnitVM.MonthlyHoldingCostRate" 
+                       asp-for="IngredientUnitVM.MonthlyHoldingCostRate"
+                               placeholder="Enter a value (e.g. 10,5)" />
+                    <span asp-validation-for="IngredientUnitVM.MonthlyHoldingCostRate" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label>Annual Demand</label>
+                    <input type="number" class="form-control" 
+                       name="IngredientUnitVM.AnnualDemand" 
+                       asp-for="IngredientUnitVM.AnnualDemand" />
+                    <span asp-validation-for="IngredientUnitVM.AnnualDemand" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+</form>
+
+<a href="@Url.Action("Index", "IngredientEntity")" class="btn btn-secondary">Back to List</a>

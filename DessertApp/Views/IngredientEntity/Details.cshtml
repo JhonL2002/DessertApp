@@ -1,0 +1,36 @@
+﻿@model DessertApp.Models.Entities.Ingredient
+
+@{
+    ViewData["Title"] = "Ingredient Details";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <h3>Name: @Model.Name</h3>
+    <p><strong>Stock:</strong> @Model.Stock</p>
+    <p><strong>Is Available:</strong> @(Model.IsAvailable ? "Yes": "No")</p>
+</div>
+
+<div>
+    <h4>Units</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Items per Unit</th>
+                <th>Cost per Unit</th>
+                <th>Ordering Cost</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Model.IngredientUnit!.ItemsPerUnit</td>
+                <td>@Model.IngredientUnit.CostPerUnit</td>
+                <td>@Model.IngredientUnit.OrderingCost</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<a href="@Url.Action("Edit", "IngredientEntity", new { id = Model.Id })" class="btn btn-warning">Edit</a>
+<a href="@Url.Action("Index", "IngredientEntity")" class="btn btn-secondary">Back to List</a>
