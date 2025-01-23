@@ -14,7 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\DessertApp.Application\DessertApp.Application.csproj" />
     <ProjectReference Include="..\DessertApp.Infraestructure\DessertApp.Infraestructure.csproj" />
+    <ProjectReference Include="..\DessertApp.Models\DessertApp.Models.csproj" />
     <ProjectReference Include="..\DessertApp.Services\DessertApp.Services.csproj" />
   </ItemGroup>
 

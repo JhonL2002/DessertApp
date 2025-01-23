@@ -1,6 +1,7 @@
-using Azure.Identity;
+using DessertApp.Application.ApplicationServicesInjectors;
 using DessertApp.Infraestructure.ConfigurationServices;
 using DessertApp.Infraestructure.Data;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,23 +18,33 @@ if (environment == "Development")
         });
         options.ListenAnyIP(8080);
     });
-}
 
-
-if (environment == "Development")
-{
     builder.Configuration
         .SetBasePath(Directory.GetCurrentDirectory())
         .AddUserSecrets<AppDbContext>();
 }
+//Configure Serilog
+var logger = new LoggerConfiguration()
+    .ReadFrom
+    .Configuration(builder.Configuration)
+    .CreateLogger();
 
-//Add extended services from infraestructure layer
+//Add extended services from Infraestructure layer
+builder.Services.AddConfigurationServices();
 builder.Services.AddExternalServices();
-builder.Services.AddApplicationServices();
-builder.Services.AddInfraestructureServices(
+builder.Services.AddIdentityServices();
+builder.Services.AddDatabaseServices(
     builder.Configuration,
     environment
 );
+builder.Services.AddRepositoriesServices();
+
+//Add extended services from Application layer
+builder.Services.AddApplicationServices();
+
+
+//Add Serilog as global logger
+builder.Logging.AddSerilog(logger);
 
 // Add general services
 builder.Services.AddControllersWithViews();
