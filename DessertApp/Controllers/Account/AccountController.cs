@@ -1,7 +1,8 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Services.AccountServices;
 using DessertApp.Services.UserManagerServices;
-using DessertApp.ViewModels;
+using DessertApp.ViewModels.AccountVM;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -64,6 +65,7 @@ namespace DessertApp.Controllers.Account
         }
 
         // GET: Account/Edit/CurrentUser
+        [Authorize]
         public async Task<IActionResult> Edit()
         {
             var user = await _userManagerService.GetUserAsync(User);
@@ -74,6 +76,7 @@ namespace DessertApp.Controllers.Account
             return View(user);
         }
 
+        [Authorize]
         public async Task<IActionResult> Edit(UserDataVM user)
         {
             var foundUser = await _userManagerService.GetUserAsync(User);

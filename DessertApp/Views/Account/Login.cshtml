@@ -1,4 +1,4 @@
-﻿@using DessertApp.ViewModels
+﻿@using DessertApp.ViewModels.AccountVM
 @model LoginVM
 
 @{
@@ -28,7 +28,7 @@
                 </div>
                 <div>
                     <p>
-                        <!---<a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>-->
+                        <a class="nav-link text-dark" id="forgot-password" asp-controller="ForgotPassword" asp-action="SendResetPassword">Forgot your password?</a>
                     </p>
                     <p>
                         <a class="nav-link text-dark" id="register" asp-controller="RegisterUser" asp-action="Register">Register as a new user</a>

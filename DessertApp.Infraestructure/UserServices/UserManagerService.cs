@@ -51,15 +51,27 @@ namespace DessertApp.Infraestructure.UserServices
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
+        public async Task<string> GeneratePasswordResetTokenAsync(AppUser user)
+        {
+            if (user == null) return null!;
+            return await _userManager.GeneratePasswordResetTokenAsync(user);
+        }
+
         public async Task<AppUser> GetUserAsync(ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal  == null) return null!;
             var id = _userManager.GetUserId(claimsPrincipal);
             if (id != null)
             {
-                return await _userManager.FindByIdAsync(id);
+                return (await _userManager.FindByIdAsync(id))!;
             }
             return null!;
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(AppUser user, string token, string newPassword)
+        {
+            if (user == null && token == null) return null!;
+            return await _userManager.ResetPasswordAsync(user!, token, newPassword);
         }
     }
 }

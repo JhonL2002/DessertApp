@@ -2,7 +2,8 @@ using DessertApp.Application.ApplicationServicesInjectors;
 using DessertApp.Infraestructure.ConfigurationServices;
 using DessertApp.Infraestructure.Data;
 using Serilog;
-
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 //Configure the global culture (en-US)

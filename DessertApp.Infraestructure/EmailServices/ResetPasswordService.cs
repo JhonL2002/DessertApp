@@ -13,16 +13,17 @@ using System.Text.Encodings.Web;
 
 namespace DessertApp.Infraestructure.EmailServices
 {
-    public class EmailConfirmationService : IEmailSenderUrl<AppUser>
+    public class ResetPasswordService : IEmailSenderUrl<AppUser>
     {
+
         private readonly IUserManagerService<IdentityResult, AppUser, IdentityOptions> _userManagerService;
         private readonly IEmailSender _emailSender;
         private readonly IWebHostEnvironment _environment;
 
         //Specify the type of implementation (to apply strategy implementation)
-        public EmailServiceType ServiceType => EmailServiceType.EmailConfirmation;
+        public EmailServiceType ServiceType => EmailServiceType.ResetPassword;
 
-        public EmailConfirmationService(
+        public ResetPasswordService(
             IUserManagerService<IdentityResult, AppUser, IdentityOptions> userManagerService,
             IEmailSender emailSender,
             IWebHostEnvironment environment)
@@ -31,24 +32,29 @@ namespace DessertApp.Infraestructure.EmailServices
             _emailSender = emailSender;
             _environment = environment;
         }
+
         public async Task<string> GenerateUrlAsync(AppUser user, string returnUrl)
         {
-            var code = await _userManagerService.GenerateEmailConfirmationTokenAsync(user);
+            //Generate reset password token
+            var code = await _userManagerService.GeneratePasswordResetTokenAsync(user);
             var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
+            //Define base URL depends on environment
             string baseUrl = _environment.IsDevelopment()
-                ? "https://localhost:443/RegisterUser/ConfirmEmail"
-                : "https://dessert-app-jhonl2002-e3bnekfderdbejbr.brazilsouth-01.azurewebsites.net/RegisterUser/ConfirmEmail";
+                ? "https://localhost:443/ResetPassword/ResetUserPassword"
+                : "https://dessert-app-jhonl2002-e3bnekfderdbejbr.brazilsouth-01.azurewebsites.net/ResetPassword/ResetUserPassword";
 
-            return UrlHelperBuilder.BuildConfirmationUrl(baseUrl, user.Id, encodedCode, returnUrl);
+            //Build Url with required parameters
+            return UrlHelperBuilder.BuildResetPasswordUrl(baseUrl, encodedCode, returnUrl);
         }
-
 
         public async Task SendEmailAsync(string email, string confirmationUrl)
         {
             await _emailSender.SendEmailAsync(
-                email, "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(confirmationUrl)}'>clicking here</a>.");
+                email,
+                "Reset Password",
+                $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(confirmationUrl)}'> clicking here</a>."
+            );
 
         }
     }

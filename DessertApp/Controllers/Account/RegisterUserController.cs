@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
-using DessertApp.Models.ViewModels;
-using DessertApp.ViewModels;
 using DessertApp.Services.UserManagerServices;
-using DessertApp.Services.EmailServices;
+using DessertApp.Services.Enums;
+using DessertApp.ViewModels.AccountVM;
+using DessertApp.Application.Strategies;
 
 namespace DessertApp.Controllers.Account
 {
@@ -14,24 +14,29 @@ namespace DessertApp.Controllers.Account
     {
         private readonly IUserManagerService<IdentityResult, AppUser, IdentityOptions> _userManagerService;
         private readonly ILogger<RegisterUserController> _logger;
-        private readonly IEmailConfirmationService<AppUser> _emailConfirmationService;
+        //private readonly IEmailSenderUrl<AppUser> _emailConfirmationService;
         private readonly IUserRoleStore<AppUser> _userRoleStore;
+        private readonly EmailServiceStrategy<AppUser> _emailServiceStrategy;
 
         public RegisterUserController(
             IUserManagerService<IdentityResult, AppUser, IdentityOptions> userManagerService,
             ILogger<RegisterUserController> logger,
-            IEmailConfirmationService<AppUser> emailConfirmationService,
-            IUserRoleStore<AppUser> userRoleStore
-            )
+            //IEmailSenderUrl<AppUser> emailConfirmationService,
+            IUserRoleStore<AppUser> userRoleStore,
+            EmailServiceStrategy<AppUser> emailServiceStrategy)
         {
             _userManagerService = userManagerService;
             _logger = logger;
-            _emailConfirmationService = emailConfirmationService;
+            //_emailConfirmationService = emailConfirmationService;
             _userRoleStore = userRoleStore;
+            _emailServiceStrategy = emailServiceStrategy;
         }
 
         public async Task<IActionResult> Register(RegisterVM model, string returnUrl = null!)
         {
+            //Call the adequate service (applying strategy)
+            var emailService = _emailServiceStrategy.GetService(EmailServiceType.EmailConfirmation);
+
             returnUrl ??= Url.Content("~/");
 
             if (!ModelState.IsValid)
@@ -45,11 +50,11 @@ namespace DessertApp.Controllers.Account
             if (result.Succeeded)
             {
                 _logger.LogInformation("User created a new account with password");
-                var callbackUrl = _emailConfirmationService.GenerateConfirmationUrlAsync(user, returnUrl);
+                var callbackUrl = emailService.GenerateUrlAsync(user, returnUrl);
 
                 try
                 {
-                     await _emailConfirmationService.SendConfirmationEmailAsync(model.Email, await callbackUrl);
+                     await emailService.SendEmailAsync(model.Email, await callbackUrl);
                 }
                 catch (Exception ex)
                 {
@@ -65,13 +70,12 @@ namespace DessertApp.Controllers.Account
             return View(model);
         }
 
-        public async Task<IActionResult> RegisterConfirmation(string email, string returnUrl)
+        public async Task<IActionResult> RegisterConfirmation(string email)
         {
             if (email == null)
             {
                 return View("/Index");
             }
-            returnUrl ??= Url.Content("~/");
 
             var user = await _userManagerService.FindByEmailAsync(email);
             if (user == null)

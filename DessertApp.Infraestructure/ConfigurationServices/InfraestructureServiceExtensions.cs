@@ -121,7 +121,8 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddTransient<IEmailRequestBuilder<MailjetRequest>, MailjetEmailRequestBuilder>();
             services.AddSingleton<IMailjetClientFactory<MailjetClient, MailjetResponse, MailjetRequest>, MailjetClientFactory>();
-            services.AddScoped<IEmailConfirmationService<AppUser>,  EmailConfirmationService>();
+            services.AddScoped<IEmailSenderUrl<AppUser>,  EmailConfirmationService>();
+            services.AddScoped<IEmailSenderUrl<AppUser>, ResetPasswordService>();
 
             //Add external key vault services (implemented Azure Key Vault)
             services.AddTransient<IManageSecrets, ManageSecrets>();

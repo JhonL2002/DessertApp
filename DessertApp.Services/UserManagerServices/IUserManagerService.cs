@@ -14,7 +14,9 @@ namespace DessertApp.Services.UserManagerServices
         Task<T?> FindByEmailAsync(string email);
         Task<T?> FindByIdAsync(string userId);
         Task<string> GenerateEmailConfirmationTokenAsync(T user);
+        Task<string> GeneratePasswordResetTokenAsync(T user);
         Task<T> GetUserAsync(ClaimsPrincipal claimsPrincipal);
+        Task<TResult> ResetPasswordAsync(T user, string token, string newPassword);
         TOptions? Options { get; set; }
     }
 }
