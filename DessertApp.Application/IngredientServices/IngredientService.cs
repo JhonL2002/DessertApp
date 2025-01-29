@@ -1,4 +1,6 @@
 ﻿using DessertApp.Models.Entities;
+using DessertApp.Services.DTOs;
+using DessertApp.Services.ImportDataServices;
 using DessertApp.Services.RepositoriesServices.DomainRepositories;
 using DessertApp.Services.UnitOfWorkServices;
 
@@ -8,10 +10,12 @@ namespace DessertApp.Application.IngredientServices
     public class IngredientService : IIngredientService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IImportIngredient<IngredientUnitImportDto> _importIngredient;
 
-        public IngredientService(IUnitOfWork unitOfWork)
+        public IngredientService(IUnitOfWork unitOfWork, IImportIngredient<IngredientUnitImportDto> importIngredient)
         {
             _unitOfWork = unitOfWork;
+            _importIngredient = importIngredient;
         }
 
         public async Task<Ingredient> CreateIngredientAsync(Ingredient ingredient, IngredientUnit ingredientUnit, CancellationToken cancellationToken)
@@ -33,6 +37,49 @@ namespace DessertApp.Application.IngredientServices
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return createdIngredient;
+        }
+
+        public async Task<List<Ingredient>> CreateIngredientsFromExternalSources(List<IngredientUnitImportDto> ingredientDtos, CancellationToken cancellationToken)
+        {
+            var ingredients = new List<Ingredient>();
+
+            //Process each DTO and insert all ingredients from file
+            foreach (var dto in ingredientDtos)
+            {
+                //Get MeasurementUnits
+                var measurementUnit = await _unitOfWork.MeasurementUnits.GetByFieldAsync("Name", dto.UnitName, cancellationToken);
+                var ingredient = new Ingredient
+                {
+                    Name = dto.IngredientName,
+                    Stock = dto.Stock ?? 0,
+                    IsAvailable = (dto.Stock ?? 0) > 0
+                };
+
+                //Create new ingredient
+                await _unitOfWork.Ingredients.CreateAsync(ingredient, cancellationToken);
+
+                //Create and associate the ingredient with unit
+                var ingredientUnit = new IngredientUnit
+                {
+                    IngredientId = ingredient.Id,
+                    UnitId = measurementUnit.Id,
+                    ItemsPerUnit = dto.ItemsPerUnit,
+                    CostPerUnit = dto.CostPerUnit,
+                    OrderingCost = dto.OrderingCost,
+                    MonthlyHoldingCostRate = dto.MonthlyHoldingCostRate,
+                    AnnualDemand = dto.AnnualDemand,
+                };
+
+                //Register IngredientUnit
+                await _unitOfWork.IngredientUnits.CreateAsync(ingredientUnit, cancellationToken);
+
+                //Add the ingredient to list to return it
+                ingredients.Add(ingredient);
+            }
+
+            //Save all changes
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            return ingredients;
         }
 
         public async Task<bool> DeleteIngredientWhitUnitsAsync(int id, CancellationToken cancellationToken)
@@ -77,7 +124,12 @@ namespace DessertApp.Application.IngredientServices
             return await _unitOfWork.GetIngredientWithUnitsAsync(id, cancellationToken);
         }
 
-        public async Task<Ingredient> UpdateIngredientAsync(Ingredient ingredient, CancellationToken cancellationToken, IngredientUnit updatedUnit)
+        public async Task<List<IngredientUnitImportDto>> ImportIngredientsFromExternalSourceAsync(Stream source, CancellationToken cancellationToken)
+        {
+            return await _importIngredient.ImportFromExternalSourceAsync(source);
+        }
+
+        public async Task<Ingredient> UpdateIngredientAsync(Ingredient ingredient, IngredientUnit updatedUnit, CancellationToken cancellationToken)
         {
             //Get existing ingredient with their units
             var existingIngredient = await _unitOfWork.Ingredients.GetByIdWithDetailsAsync(

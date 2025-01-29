@@ -17,11 +17,48 @@ namespace DessertApp.Controllers.IngredientEntity
         public IngredientEntityController(
             IIngredientService ingredientService,
             IMeasurementUnitService measurementUnitService,
-            ILogger<IngredientEntityController> logger)
+            ILogger<IngredientEntityController> logger
+        )
         {
             _ingredientService = ingredientService;
             _measurementUnitService = measurementUnitService;
             _logger = logger;
+        }
+
+        //Get the import view
+        public IActionResult Import()
+        {
+            return View();
+        }
+
+        //Process the upload file
+        [HttpPost]
+        public async Task<IActionResult> Import(IFormFile file, CancellationToken cancellationToken)
+        {
+            if (file == null || file.Length == 0)
+            {
+                ModelState.AddModelError("File", "Please select a valid file");
+                return View();
+            }
+
+            try
+            {
+                //Read file and get data
+                using var stream = file.OpenReadStream();
+                var ingredientDtos = await _ingredientService.ImportIngredientsFromExternalSourceAsync(stream, cancellationToken);
+
+                //Create ingredients
+                var ingredients = await _ingredientService.CreateIngredientsFromExternalSources(ingredientDtos, cancellationToken);
+
+                //Redirect to success view
+                TempData["SuccessMessage"] = $"{ingredients.Count} ingredients added successfully!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"An error has occurred while process file: {ex.Message}");
+                return View();
+            }
         }
 
         //List all ingredients
@@ -176,7 +213,7 @@ namespace DessertApp.Controllers.IngredientEntity
 
 
                 // Actualizar el ingrediente y sus unidades
-                await _ingredientService.UpdateIngredientAsync(ingredient, cancellationToken, updatedUnits);
+                await _ingredientService.UpdateIngredientAsync(ingredient, updatedUnits, cancellationToken);
 
                 return RedirectToAction(nameof(Index));
             }

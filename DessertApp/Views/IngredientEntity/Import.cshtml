@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Import Ingredients";
+}
+
+<h1>Import Ingredients</h1>
+
+<form asp-action="Import" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="file">Select an excel file:</label>
+        <input type="file" name="file" id="file" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Import</button>
+</form>
+
+@if(TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <p>@error.ErrorMessage</p>
+        }
+    </div>
+}

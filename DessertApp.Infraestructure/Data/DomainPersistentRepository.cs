@@ -1,6 +1,5 @@
 ﻿using DessertApp.Services.RepositoriesServices;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace DessertApp.Infraestructure.Data
@@ -47,6 +46,20 @@ namespace DessertApp.Infraestructure.Data
         public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken)
         {
             return await _dbSet.ToListAsync(cancellationToken);
+        }
+
+        public async Task<T> GetByFieldAsync(string fieldName, string value, CancellationToken cancellationToken)
+        {
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var property = Expression.Property(parameter, fieldName);
+            var constant = Expression.Constant(value);
+            var equality = Expression.Equal(property, constant);
+            var predicate = Expression.Lambda<Func<T,bool>>(equality, parameter);
+
+            return await _dbSet
+                .Where(predicate)
+                .FirstOrDefaultAsync(cancellationToken)
+                ?? throw new KeyNotFoundException($"Entity with {fieldName} = {value} not found.");
         }
 
         public async Task<T> GetByIdAsync(TKey id, CancellationToken cancellationToken)

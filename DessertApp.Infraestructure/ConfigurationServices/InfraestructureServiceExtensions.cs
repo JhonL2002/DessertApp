@@ -3,6 +3,7 @@ using DessertApp.Infraestructure.Data;
 using DessertApp.Infraestructure.DataInitializerServices;
 using DessertApp.Infraestructure.EmailServices;
 using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Infraestructure.ImportDataServices;
 using DessertApp.Infraestructure.Repositories;
 using DessertApp.Infraestructure.ResilienceServices;
 using DessertApp.Infraestructure.RoleServices;
@@ -12,8 +13,10 @@ using DessertApp.Infraestructure.UserServices;
 using DessertApp.Services.AccountServices;
 using DessertApp.Services.ConfigurationServices;
 using DessertApp.Services.DataInitializerServices;
+using DessertApp.Services.DTOs;
 using DessertApp.Services.EmailServices;
 using DessertApp.Services.IEmailServices;
+using DessertApp.Services.ImportDataServices;
 using DessertApp.Services.Repositories;
 using DessertApp.Services.RepositoriesServices;
 using DessertApp.Services.RoleStoreServices;
@@ -121,11 +124,14 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddTransient<IEmailRequestBuilder<MailjetRequest>, MailjetEmailRequestBuilder>();
             services.AddSingleton<IMailjetClientFactory<MailjetClient, MailjetResponse, MailjetRequest>, MailjetClientFactory>();
-            services.AddScoped<IEmailSenderUrl<AppUser>,  EmailConfirmationService>();
+            services.AddScoped<IEmailSenderUrl<AppUser>, EmailConfirmationService>();
             services.AddScoped<IEmailSenderUrl<AppUser>, ResetPasswordService>();
 
             //Add external key vault services (implemented Azure Key Vault)
             services.AddTransient<IManageSecrets, ManageSecrets>();
+
+            //Add external services to work with massive data (Import data from Excel)
+            services.AddScoped<IImportIngredient<IngredientUnitImportDto>, ImportIngredient>();
 
             return services;
         }
