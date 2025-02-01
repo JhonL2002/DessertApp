@@ -5,19 +5,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DessertApp.Controllers.IngredientEntity
+namespace DessertApp.Controllers.Ingredients
 {
     [Authorize(Roles = "Admin")]
-    public class IngredientEntityController : Controller
+    public class IngredientController : Controller
     {
         private readonly IIngredientService _ingredientService;
         private readonly IMeasurementUnitService _measurementUnitService;
-        private readonly ILogger<IngredientEntityController> _logger;
+        private readonly ILogger<IngredientController> _logger;
 
-        public IngredientEntityController(
+        public IngredientController(
             IIngredientService ingredientService,
             IMeasurementUnitService measurementUnitService,
-            ILogger<IngredientEntityController> logger
+            ILogger<IngredientController> logger
         )
         {
             _ingredientService = ingredientService;
@@ -117,7 +117,7 @@ namespace DessertApp.Controllers.IngredientEntity
             return View(ingredient);
         }
 
-        
+
 
         //GET: Ingredients/Delete/id
         //Delete an ingredient (Included Ingredient Units)
@@ -182,16 +182,14 @@ namespace DessertApp.Controllers.IngredientEntity
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, IngredientEditVM model, CancellationToken cancellationToken)
         {
-            // Validar que el ID del modelo coincida con el ID del ingrediente
+            // Validate ID model matches ID Ingredient
             if (id != model.Id)
             {
                 return BadRequest();
             }
 
-            // Verificar si el modelo es válido
             if (ModelState.IsValid)
             {
-                // Mapear el ViewModel al modelo de dominio
                 var ingredient = new Ingredient
                 {
                     Id = model.Id,
@@ -211,8 +209,6 @@ namespace DessertApp.Controllers.IngredientEntity
                     AnnualDemand = model.IngredientUnitVM.AnnualDemand
                 };
 
-
-                // Actualizar el ingrediente y sus unidades
                 await _ingredientService.UpdateIngredientAsync(ingredient, updatedUnits, cancellationToken);
 
                 return RedirectToAction(nameof(Index));

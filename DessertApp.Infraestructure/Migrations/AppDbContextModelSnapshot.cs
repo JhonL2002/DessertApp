@@ -126,6 +126,9 @@ namespace DessertApp.Infraestructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AnnualDemand")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(500)
@@ -181,24 +184,28 @@ namespace DessertApp.Infraestructure.Migrations
 
             modelBuilder.Entity("DessertApp.Models.Entities.DessertIngredient", b =>
                 {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<int>("DessertId")
                         .HasColumnType("int");
 
                     b.Property<int>("IngredientId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuantityRequired")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(1);
+                    b.Property<decimal>("QuantityRequired")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("UnitId")
                         .HasColumnType("int");
 
-                    b.HasKey("DessertId", "IngredientId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("DessertId");
 
                     b.HasIndex("IngredientId");
 
@@ -242,9 +249,6 @@ namespace DessertApp.Infraestructure.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AnnualDemand")
-                        .HasColumnType("int");
 
                     b.Property<decimal?>("CostPerUnit")
                         .HasPrecision(18, 2)
@@ -295,13 +299,66 @@ namespace DessertApp.Infraestructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Units");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "Generic Unit"
-                        });
+            modelBuilder.Entity("DessertApp.Models.Entities.PurchaseOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("ExpectedDeliveryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("OrderDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PurchaseOrders");
+                });
+
+            modelBuilder.Entity("DessertApp.Models.Entities.PurchaseOrderDetail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IngredientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseOrderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Subtotal")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitCost")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IngredientId");
+
+                    b.HasIndex("PurchaseOrderId");
+
+                    b.ToTable("PurchaseOrderDetails");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.Sale", b =>
@@ -482,13 +539,13 @@ namespace DessertApp.Infraestructure.Migrations
 
             modelBuilder.Entity("DessertApp.Models.Entities.DessertIngredient", b =>
                 {
-                    b.HasOne("DessertApp.Models.Entities.Dessert", null)
+                    b.HasOne("DessertApp.Models.Entities.Dessert", "Dessert")
                         .WithMany()
                         .HasForeignKey("DessertId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("DessertApp.Models.Entities.Ingredient", null)
+                    b.HasOne("DessertApp.Models.Entities.Ingredient", "Ingredient")
                         .WithMany()
                         .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -499,6 +556,10 @@ namespace DessertApp.Infraestructure.Migrations
                         .HasForeignKey("UnitId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Dessert");
+
+                    b.Navigation("Ingredient");
 
                     b.Navigation("Unit");
                 });
@@ -520,6 +581,25 @@ namespace DessertApp.Infraestructure.Migrations
                     b.Navigation("Ingredient");
 
                     b.Navigation("Unit");
+                });
+
+            modelBuilder.Entity("DessertApp.Models.Entities.PurchaseOrderDetail", b =>
+                {
+                    b.HasOne("DessertApp.Models.Entities.Ingredient", "Ingredient")
+                        .WithMany()
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DessertApp.Models.Entities.PurchaseOrder", "PurchaseOrder")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("PurchaseOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("PurchaseOrder");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.SaleDetail", b =>
@@ -599,8 +679,12 @@ namespace DessertApp.Infraestructure.Migrations
 
             modelBuilder.Entity("DessertApp.Models.Entities.Ingredient", b =>
                 {
-                    b.Navigation("IngredientUnit")
-                        .IsRequired();
+                    b.Navigation("IngredientUnit");
+                });
+
+            modelBuilder.Entity("DessertApp.Models.Entities.PurchaseOrder", b =>
+                {
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.Sale", b =>

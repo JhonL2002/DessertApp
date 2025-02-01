@@ -44,7 +44,7 @@ namespace DessertApp.Infraestructure.UnitOfWorkServices
             if (ingredientUnit.UnitId <= 0)
             {
                 var defaultUnit = await _appDbContext.Set<MeasurementUnit>()
-                     .FindAsync([1], cancellationToken) ?? throw new Exception("Unable to find a default measurement unit");
+                     .FindAsync([4], cancellationToken) ?? throw new Exception("Unable to find a default measurement unit");
 
                 //Assign a default measurement unit
                 ingredientUnit.UnitId = defaultUnit.Id;

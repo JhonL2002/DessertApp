@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DessertApp.Models.Entities
 {
@@ -27,10 +22,14 @@ namespace DessertApp.Models.Entities
 
         public bool IsAvailable { get; set; }
 
-        [ForeignKey(nameof(DessertCategory))]
+        public int? AnnualDemand { get; set; }
+
         public int DessertCategoryId { get; set; }
 
         //One dessert belongs to one category
         public DessertCategory DessertCategory { get; set; }
+
+        [NotMapped]
+        public bool IsLowDemand => AnnualDemand.HasValue && AnnualDemand < 100;
     }
 }

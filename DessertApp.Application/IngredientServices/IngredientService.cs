@@ -21,7 +21,7 @@ namespace DessertApp.Application.IngredientServices
         public async Task<Ingredient> CreateIngredientAsync(Ingredient ingredient, IngredientUnit ingredientUnit, CancellationToken cancellationToken)
         {
             ingredient.IsAvailable = ingredient.Stock > 0;
-            ingredientUnit.Unit ??= await _unitOfWork.MeasurementUnits.GetByIdAsync(1, cancellationToken);
+            ingredientUnit.Unit ??= await _unitOfWork.MeasurementUnits.GetByIdAsync(4, cancellationToken);
             ingredientUnit.Ingredient = ingredient;
 
             //Create ingredient

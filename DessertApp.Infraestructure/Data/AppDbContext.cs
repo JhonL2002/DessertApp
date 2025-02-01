@@ -22,6 +22,8 @@ namespace DessertApp.Infraestructure.Data
         public DbSet<SaleDetail> SaleDetails { get; set; }
         public DbSet<MeasurementUnit> Units { get; set; }
         public DbSet<IngredientUnit> IngredientUnits { get; set; }
+        public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+        public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -119,74 +121,102 @@ namespace DessertApp.Infraestructure.Data
             //DessertIngredient
             builder.Entity<DessertIngredient>(entity =>
             {
-                entity.HasKey(di => new
-                {
-                    di.DessertId, di.IngredientId
-                });
+                entity.HasKey(di => di.Id);
 
                 entity.Property(di => di.QuantityRequired)
-                .IsRequired()
-                .HasDefaultValue(1);
+                    .IsRequired()
+                    .HasPrecision(18, 2);
 
-                entity.HasOne<Dessert>()
-                .WithMany()
-                .HasForeignKey(di => di.DessertId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-                entity.HasOne<Ingredient>()
-                .WithMany()
-                .HasForeignKey(di => di.IngredientId)
-                .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(di => di.Dessert)
+                    .WithMany()
+                    .HasForeignKey(di => di.DessertId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(di => di.Unit)
-                .WithMany()
-                .HasForeignKey(di => di.UnitId)
-                .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany()
+                    .HasForeignKey(mu => mu.UnitId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(di => di.Ingredient)
+                    .WithMany()
+                    .HasForeignKey(di => di.IngredientId)
+                    .OnDelete(DeleteBehavior.Cascade);
+            });
+
+            //PurchaseOrder
+            builder.Entity<PurchaseOrder>(entity =>
+            {
+                entity.HasKey(po => po.Id);
+
+                entity.Property(po => po.TotalCost)
+                    .HasPrecision(18, 2);
+            });
+
+            //PurchaseOrderDetail
+            builder.Entity<PurchaseOrderDetail>(entity =>
+            {
+                entity.HasKey(pod => pod.Id);
+
+                entity.HasOne(pod => pod.PurchaseOrder)
+                    .WithMany(po => po.OrderDetails)
+                    .HasForeignKey(pod => pod.PurchaseOrderId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(pod => pod.Ingredient)
+                    .WithMany()
+                    .HasForeignKey(pod => pod.IngredientId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(pod => pod.Subtotal)
+                    .HasPrecision(18, 2);
+
+                entity.Property(pod => pod.UnitCost)
+                    .HasPrecision(18, 2);
             });
 
             //Sale
             builder.Entity<Sale>(entity =>
             {
                 entity.Property(s => s.Date)
-                .IsRequired();
+                    .IsRequired();
 
                 entity.Property(s => s.TotalAmount)
-                .IsRequired()
-                .HasPrecision(18, 2);
+                    .IsRequired()
+                    .HasPrecision(18, 2);
 
                 entity.Property(s => s.PaymentMethod)
-                .IsRequired()
-                .HasMaxLength(50);
+                    .IsRequired()
+                    .HasMaxLength(50);
 
                 entity.Property(s => s.CreatedByUserId)
-                .IsRequired();
+                    .IsRequired();
 
                 entity.HasMany(s => s.SaleDetails)
-                .WithOne(sd => sd.Sale)
-                .HasForeignKey(sd => sd.SaleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                    .WithOne(sd => sd.Sale)
+                    .HasForeignKey(sd => sd.SaleId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             //SaleDetail
             builder.Entity<SaleDetail>(entity =>
             {
                 entity.Property(sd => sd.Quantity)
-                .IsRequired();
+                    .IsRequired();
 
                 entity.Property(sd => sd.Subtotal)
-                .IsRequired()
-                .HasPrecision(18, 2);
+                    .IsRequired()
+                    .HasPrecision(18, 2);
 
                 entity.HasOne(sd => sd.Sale)
-                .WithMany(s => s.SaleDetails)
-                .HasForeignKey(sd => sd.SaleId)
-                .OnDelete(DeleteBehavior.Cascade);
+                    .WithMany(s => s.SaleDetails)
+                    .HasForeignKey(sd => sd.SaleId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
 
                 entity.HasOne(sd => sd.Dessert)
-                .WithMany()
-                .HasForeignKey(sd => sd.DessertId)
-                .OnDelete(DeleteBehavior.Restrict);
+                    .WithMany()
+                    .HasForeignKey(sd => sd.DessertId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             //MeasurementUnit
@@ -195,13 +225,8 @@ namespace DessertApp.Infraestructure.Data
                 entity.HasKey(mu => mu.Id);
 
                 entity.Property(mu => mu.Name)
-                .IsRequired()
-                .HasMaxLength(50);
-
-                entity.HasData(new MeasurementUnit
-                {
-                    Id = 1, Name = "Generic Unit"
-                });
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             base.OnModelCreating(builder);

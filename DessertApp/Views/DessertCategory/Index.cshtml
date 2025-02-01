@@ -1,0 +1,41 @@
+﻿@using DessertApp.Models.Entities
+@model IEnumerable<DessertCategory>
+
+@{
+    ViewData["Title"] = "Dessert Categories List";
+}
+
+<h1>@ViewData["Ttile"]</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var category in Model)
+        {
+            <tr>
+                <td>@category.Name</td>
+                <td>@category.Description</td>
+                <td>
+                    <a href="@Url.Action("Edit", "Ingredient", new {id = category.Id})">Edit</a>
+                    <a href="@Url.Action("Delete", "Ingredient", new {id = category.Id})">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Associated Desserts</h2>
+@if(Model.Any((DessertCategory dc) => { return dc.Desserts.Any(); })){
+    <p>Put data here!!</p>
+}else
+{
+    <p>There's nothing to show</p>
+}
+
+<a href="@Url.Action("Create", "DessertCategory")" class="btn btn-primary">Create New Category</a>
+

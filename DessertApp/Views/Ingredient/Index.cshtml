@@ -23,13 +23,13 @@
                 <td>@ingredient.Stock</td>
                 <td>@ingredient.IsAvailable</td>
                 <td>
-                    <a href="@Url.Action("Details", "IngredientEntity", new {id = ingredient.Id})">Details</a> |
-                    <a href="@Url.Action("Edit", "IngredientEntity", new {id = ingredient.Id})">Edit</a> |
-                    <a href="@Url.Action("Delete", "IngredientEntity", new {id = ingredient.Id})">Delete</a>
+                    <a href="@Url.Action("Details", "Ingredient", new {id = ingredient.Id})">Details</a> |
+                    <a href="@Url.Action("Edit", "Ingredient", new {id = ingredient.Id})">Edit</a> |
+                    <a href="@Url.Action("Delete", "Ingredient", new {id = ingredient.Id})">Delete</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 
-<a href="@Url.Action("Create", "IngredientEntity")" class="btn btn-primary">Create New Ingredient</a>
+<a href="@Url.Action("Create", "Ingredient")" class="btn btn-primary">Create New Ingredient</a>

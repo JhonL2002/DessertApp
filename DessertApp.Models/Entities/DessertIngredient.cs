@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DessertApp.Models.Entities
 {
     public class DessertIngredient
     {
         public int Id { get; set; }
+
         public int DessertId { get; set; }
+        public Dessert Dessert { get; set; }
+
         public int IngredientId { get; set; }
+        public Ingredient Ingredient { get; set; }
 
         //Minimum quantity required
-        [Range(1, int.MaxValue)]
-        public int QuantityRequired { get; set; }
+        [Range(0.01, double.MaxValue)]
+        public decimal QuantityRequired { get; set; }
 
         //Foreign key to MeasurementUnit
         public int UnitId { get; set; }

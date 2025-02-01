@@ -27,6 +27,7 @@ namespace DessertApp.Models.Entities
         [Range(0.0, 1.0)]
         public decimal? MonthlyHoldingCostRate { get; set; }
 
+        [NotMapped]
         public int? AnnualDemand {  get; set; }
 
         [NotMapped]
