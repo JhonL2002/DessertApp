@@ -12,19 +12,22 @@ namespace DessertApp.Controllers.Account
     {
         private readonly IAuthenticationService<Microsoft.AspNetCore.Identity.SignInResult, IdentityResult, AppUser> _authenticationService;
         private readonly IUserManagerService<IdentityResult, AppUser, IdentityOptions> _userManagerService;
-        private readonly IUserPhoneNumberStore<AppUser> _userPhone;
         private readonly ILogger<AccountController> _logger;
 
         public AccountController(
             IAuthenticationService<Microsoft.AspNetCore.Identity.SignInResult, IdentityResult, AppUser> authenticationService,
             IUserManagerService<IdentityResult, AppUser, IdentityOptions> userManagerService,
-            IUserPhoneNumberStore<AppUser> userPhone,
             ILogger<AccountController> logger)
         {
             _authenticationService = authenticationService;
             _userManagerService = userManagerService;
-            _userPhone = userPhone;
             _logger = logger;
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
 
         [HttpGet]
@@ -73,10 +76,17 @@ namespace DessertApp.Controllers.Account
             {
                 return NotFound($"Unable to load user.");
             }
-            return View(user);
+
+            var model = new UserDataVM
+            {
+                Username = user.UserName,
+                PhoneNumber = user.PhoneNumber
+            };
+            return View(model);
         }
 
         [Authorize]
+        [HttpPost]
         public async Task<IActionResult> Edit(UserDataVM user)
         {
             var foundUser = await _userManagerService.GetUserAsync(User);
@@ -90,11 +100,13 @@ namespace DessertApp.Controllers.Account
                 return View(user);
             }
 
-            var phoneNumber = await _userPhone.GetPhoneNumberAsync(foundUser, CancellationToken.None);
+            var phoneNumber = await _userManagerService.GetPhoneNumberAsync(foundUser);
             if (user.PhoneNumber != phoneNumber)
             {
-                await _userPhone.SetPhoneNumberAsync(foundUser, user.PhoneNumber, CancellationToken.None);
+                await _userManagerService.SetPhoneNumberAsync(foundUser, user.PhoneNumber);
             }
+
+            user.Username = foundUser.UserName;
 
             await _authenticationService.RefreshSignInAsync(foundUser);
             user.StatusMessage = "Your profile has been updated";

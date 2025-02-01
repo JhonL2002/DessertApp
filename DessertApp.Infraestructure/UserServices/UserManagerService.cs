@@ -57,6 +57,12 @@ namespace DessertApp.Infraestructure.UserServices
             return await _userManager.GeneratePasswordResetTokenAsync(user);
         }
 
+        public async Task<string> GetPhoneNumberAsync(AppUser user)
+        {
+            if (user == null) return null!;
+            return (await _userManager.GetPhoneNumberAsync(user))!;
+        }
+
         public async Task<AppUser> GetUserAsync(ClaimsPrincipal claimsPrincipal)
         {
             if (claimsPrincipal  == null) return null!;
@@ -72,6 +78,11 @@ namespace DessertApp.Infraestructure.UserServices
         {
             if (user == null && token == null) return null!;
             return await _userManager.ResetPasswordAsync(user!, token, newPassword);
+        }
+
+        public async Task<IdentityResult> SetPhoneNumberAsync(AppUser user, string? phoneNumber)
+        {
+            return await _userManager.SetPhoneNumberAsync(user, phoneNumber);
         }
     }
 }
