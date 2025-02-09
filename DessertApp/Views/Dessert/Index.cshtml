@@ -1,0 +1,37 @@
+﻿@using DessertApp.Models.Entities
+@model IEnumerable<Dessert>
+
+@{
+    ViewData["Title"] = "Desserts";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<a href="@Url.Action("Create", "Dessert")" class="btn btn-primary">Create New Dessert</a>
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Is Available?</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dessert in Model)
+        {
+            <tr>
+                <td>@dessert.Name</td>
+                <td>@dessert.Price.ToString("C")</td>
+                <td>@(dessert.IsAvailable ? "Yes": "No")</td>
+                <td>
+                    <a href="@Url.Action("Details", "Dessert", new { id = dessert.Id })" class="btn btn-info btn-sm">Details</a>
+                    <a href="@Url.Action("Edit", "Dessert", new { id = dessert.Id })" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="@Url.Action("Delete", "Dessert", new { id = dessert.Id })" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

@@ -10,12 +10,7 @@ namespace DessertApp.Services.UnitOfWorkServices
         IDomainGenericRepository<Ingredient, int> Ingredients { get; }
         IDomainGenericRepository<IngredientUnit, int> IngredientUnits {  get; }
         IDomainGenericRepository<MeasurementUnit, int> MeasurementUnits { get; }
-        
-        //Add some query methods
-        Task<Ingredient> CreateAsync(Ingredient ingredient, IngredientUnit ingredientUnit, CancellationToken cancellationToken);
-        Task<Ingredient> DeleteAsync(Ingredient ingredient, IngredientUnit ingredientUnit, CancellationToken cancellationToken);
-        Task<Ingredient> UpdateAsync(Ingredient ingredient, IngredientUnit ingredientUnit, CancellationToken cancellationToken);
-        Task<Ingredient> GetIngredientWithUnitsAsync(int id, CancellationToken cancellationToken);
+        IDomainGenericRepository<DessertIngredient, int> DessertIngredients { get; }
 
         //Commit changes to database
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

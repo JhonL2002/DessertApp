@@ -5,37 +5,86 @@
     ViewData["Title"] = "Dessert Categories List";
 }
 
-<h1>@ViewData["Ttile"]</h1>
+<h1>@ViewData["Title"]</h1>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var category in Model)
-        {
-            <tr>
-                <td>@category.Name</td>
-                <td>@category.Description</td>
-                <td>
-                    <a href="@Url.Action("Edit", "Ingredient", new {id = category.Id})">Edit</a>
-                    <a href="@Url.Action("Delete", "Ingredient", new {id = category.Id})">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<h2>Associated Desserts</h2>
-@if(Model.Any((DessertCategory dc) => { return dc.Desserts.Any(); })){
-    <p>Put data here!!</p>
-}else
+@if(TempData["ErrorMessage"] != null)
 {
-    <p>There's nothing to show</p>
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+@if(TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
 }
 
 <a href="@Url.Action("Create", "DessertCategory")" class="btn btn-primary">Create New Category</a>
 
+@if(!Model.Any())
+{
+    <div class="alert alert-info">No dessert categories available to show.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in Model)
+            {
+                <tr class="table-primary">
+                    <td>@category.Name</td>
+                    <td>@category.Description</td>
+                    <td>
+                        <a href="@Url.Action("Edit", "DessertCategory", new { id = category.Id })" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="@Url.Action("Delete", "DessertCategory", new { id = category.Id })" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+
+                @if (category.Desserts?.Any() ?? false)
+                {
+                    <tr>
+                        <td colspan="3">
+                            <h5>Associated Desserts</h5>
+                            <table class="table table-bordered table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var dessert in category.Desserts)
+                                    {
+                                        <tr>
+                                            <td>@dessert.Name</td>
+                                            <td>@dessert.Price.ToString("C")</td>
+                                            <td>@dessert.Stock</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3">
+                            <div class="alert alert-info">No desserts available for this category.</div>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+}

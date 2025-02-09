@@ -29,7 +29,9 @@ namespace DessertApp.Models.Entities
         //One dessert belongs to one category
         public DessertCategory DessertCategory { get; set; }
 
+        public ICollection<DessertIngredient> DessertIngredients { get; set; }
+
         [NotMapped]
-        public bool IsLowDemand => AnnualDemand.HasValue && AnnualDemand < 100;
+        public bool IsLowDemand => AnnualDemand.HasValue && AnnualDemand < 100 ;
     }
 }

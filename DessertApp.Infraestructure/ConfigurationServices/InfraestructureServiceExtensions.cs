@@ -1,6 +1,11 @@
-﻿using DessertApp.Infraestructure.AccountServices;
+﻿using AspNetCoreRateLimit;
+using DessertApp.Application.MeasurementUnitServices;
+using DessertApp.Infraestructure.AccountServices;
+using DessertApp.Infraestructure.CacheServices;
 using DessertApp.Infraestructure.Data;
 using DessertApp.Infraestructure.DataInitializerServices;
+using DessertApp.Infraestructure.DessertServices;
+using DessertApp.Infraestructure.DomainRepositories;
 using DessertApp.Infraestructure.EmailServices;
 using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Infraestructure.ImportDataServices;
@@ -11,6 +16,7 @@ using DessertApp.Infraestructure.SecretServices;
 using DessertApp.Infraestructure.UnitOfWorkServices;
 using DessertApp.Infraestructure.UserServices;
 using DessertApp.Services.AccountServices;
+using DessertApp.Services.CacheServices;
 using DessertApp.Services.ConfigurationServices;
 using DessertApp.Services.DataInitializerServices;
 using DessertApp.Services.DTOs;
@@ -19,6 +25,7 @@ using DessertApp.Services.IEmailServices;
 using DessertApp.Services.ImportDataServices;
 using DessertApp.Services.Repositories;
 using DessertApp.Services.RepositoriesServices;
+using DessertApp.Services.RepositoriesServices.DomainRepositories;
 using DessertApp.Services.RoleStoreServices;
 using DessertApp.Services.SecretServices;
 using DessertApp.Services.UnitOfWorkServices;
@@ -29,8 +36,6 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace DessertApp.Infraestructure.ConfigurationServices
 {
@@ -110,6 +115,18 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             //Services for repositories
             services.AddScoped<IGenericIdentityRepository<AppRole, IdentityResult, string>, RoleRepository>();
             services.AddScoped(typeof(IDomainGenericRepository<,>), typeof(DomainPersistentRepository<,>));
+            services.AddScoped(typeof(DomainPersistentRepository<,>));
+
+            //Dessert Repositories
+            services.AddScoped<IDessertRepository, DessertRepository>();
+            services.AddScoped<IDessertCategoryRepository, DessertCategoryRepository>();
+            services.AddScoped<IDessertIngredientRepository, DessertIngredientRepository>();
+
+            //Ingredient Repositories
+            services.AddScoped<IIngredientRepository, IngredientRepository>();
+
+            //MeasurementUnit Repositories
+            services.AddScoped<IMeasurementUnitRepository, MeasurementUnitRepository>();
 
             //UnitOfWork services
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -136,9 +153,25 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             return services;
         }
 
-        public static IServiceCollection AddConfigurationServices(this IServiceCollection services)
+        public static IServiceCollection AddConfigurationServices(this IServiceCollection services, IConfigurationManager configuration)
         {
+            //Add customized configurations
             services.AddTransient<IConfigurationFactory<IConfiguration>, ConfigurationFactory>();
+
+            //Add cache services
+            services.AddMemoryCache();
+            services.AddTransient<IDessertCategoryCacheService, DessertCategoryCacheService>();
+
+            //Add Rate Limiting Services
+            services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
+            services.Configure<IpRateLimitPolicies>(configuration.GetSection("IpRateLimitPolicies"));
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
+            //Add some default strategies to rate limiting
+            services.AddSingleton<IProcessingStrategy, AsyncKeyLockProcessingStrategy>();
+
             return services;
         }
 

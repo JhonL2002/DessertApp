@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DessertApp.Models.Entities
 {
@@ -16,6 +11,9 @@ namespace DessertApp.Models.Entities
 
         public int IngredientId { get; set; }
         public Ingredient Ingredient { get; set; }
+
+        public int UnitId { get; set; }
+        public MeasurementUnit Unit { get; set; }
 
         [Range(1, int.MaxValue)]
         public int Quantity { get; set; }

@@ -3,7 +3,9 @@ using DessertApp.Infraestructure.Data;
 using Serilog;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using DessertApp.Application.InjectServices;
+using AspNetCoreRateLimit;
+using DessertApp.Application.DessertServices;
+using DessertApp.Application.ApplicationServicesInjections;
 var builder = WebApplication.CreateBuilder(args);
 
 //Configure the global culture (en-US)
@@ -35,7 +37,7 @@ var logger = new LoggerConfiguration()
     .CreateLogger();
 
 //Add extended services from Infraestructure layer
-builder.Services.AddConfigurationServices();
+builder.Services.AddConfigurationServices(builder.Configuration);
 builder.Services.AddExternalServices();
 builder.Services.AddIdentityServices();
 builder.Services.AddDatabaseServices(
@@ -75,6 +77,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
     app.UseHttpsRedirection();
 }
+
+// Apply rate limiting middleware
+app.UseIpRateLimiting();
 
 //app.UseHttpsRedirection();
 app.UseStaticFiles();

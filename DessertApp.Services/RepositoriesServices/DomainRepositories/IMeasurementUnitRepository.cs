@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DessertApp.Services.RepositoriesServices.DomainRepositories
 {
-    public interface IMeasurementUnitService
+    public interface IMeasurementUnitRepository
     {
         Task<IEnumerable<MeasurementUnit>> GetMeasurementUnitsAsync(CancellationToken cancellationToken);  
     }

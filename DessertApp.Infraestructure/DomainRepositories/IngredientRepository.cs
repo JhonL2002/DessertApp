@@ -3,16 +3,20 @@ using DessertApp.Services.DTOs;
 using DessertApp.Services.ImportDataServices;
 using DessertApp.Services.RepositoriesServices.DomainRepositories;
 using DessertApp.Services.UnitOfWorkServices;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace DessertApp.Application.IngredientServices
+namespace DessertApp.Infraestructure.DomainRepositories
 {
-
-    public class IngredientService : IIngredientService
+    public class IngredientRepository : IIngredientRepository
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IImportIngredient<IngredientUnitImportDto> _importIngredient;
 
-        public IngredientService(IUnitOfWork unitOfWork, IImportIngredient<IngredientUnitImportDto> importIngredient)
+        public IngredientRepository(IUnitOfWork unitOfWork, IImportIngredient<IngredientUnitImportDto> importIngredient)
         {
             _unitOfWork = unitOfWork;
             _importIngredient = importIngredient;
@@ -25,13 +29,13 @@ namespace DessertApp.Application.IngredientServices
             ingredientUnit.Ingredient = ingredient;
 
             //Create ingredient
-            var createdIngredient = await _unitOfWork.Ingredients.CreateAsync(ingredient, cancellationToken);
-            
+            var createdIngredient = await _unitOfWork.Ingredients.AddAsync(ingredient, cancellationToken);
+
             //Assign ID into main ingredient for the IngredientUnit entity
             ingredientUnit.IngredientId = createdIngredient.Id;
 
             //Create initial unit from Ingredient
-            await _unitOfWork.IngredientUnits.CreateAsync(ingredientUnit, cancellationToken);
+            await _unitOfWork.IngredientUnits.AddAsync(ingredientUnit, cancellationToken);
 
             //Save changes
             await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -46,23 +50,42 @@ namespace DessertApp.Application.IngredientServices
             //Process each DTO and insert all ingredients from file
             foreach (var dto in ingredientDtos)
             {
-                //Get MeasurementUnits
-                var measurementUnit = await _unitOfWork.MeasurementUnits.GetByFieldAsync("Name", dto.UnitName, cancellationToken);
-                var ingredient = new Ingredient
+                //Verify if ingredient already exists
+                var existingIngredient = await _unitOfWork.Ingredients.GetByFieldAsync("Name", dto.IngredientName, cancellationToken);
+                if (existingIngredient != null)
                 {
-                    Name = dto.IngredientName,
-                    Stock = dto.Stock ?? 0,
-                    IsAvailable = (dto.Stock ?? 0) > 0
-                };
+                    //If ingredient exists, don't attach into EF
+                    _unitOfWork.Ingredients.Attach(existingIngredient, cancellationToken);
 
-                //Create new ingredient
-                await _unitOfWork.Ingredients.CreateAsync(ingredient, cancellationToken);
+                    //If ingredient exists, add to list an continue
+                    ingredients.Add(existingIngredient);
+                    continue;
+                }
+                else
+                {
+                    //Create a new ingredient if not exists
+                    var ingredient = new Ingredient
+                    {
+                        Name = dto.IngredientName,
+                        Stock = dto.Stock ?? 0,
+                        IsAvailable = (dto.Stock ?? 0) > 0
+                    };
+
+                    //Save new ingredient to generate Id
+                    await _unitOfWork.Ingredients.AddAsync(ingredient, cancellationToken);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+                    ingredients.Add(ingredient);
+
+                    existingIngredient = ingredient;
+                }
+                //Get MeasurementUnits
+                var measurementUnit = await _unitOfWork.MeasurementUnits.GetByFieldAsync("Name", dto.UnitName, cancellationToken) ?? throw new InvalidOperationException($"The measurement unit '{dto.UnitName}' does not exist");
 
                 //Create and associate the ingredient with unit
                 var ingredientUnit = new IngredientUnit
                 {
-                    IngredientId = ingredient.Id,
-                    UnitId = measurementUnit.Id,
+                    IngredientId = existingIngredient.Id,
+                    UnitId = measurementUnit!.Id,
                     ItemsPerUnit = dto.ItemsPerUnit,
                     CostPerUnit = dto.CostPerUnit,
                     OrderingCost = dto.OrderingCost,
@@ -71,10 +94,7 @@ namespace DessertApp.Application.IngredientServices
                 };
 
                 //Register IngredientUnit
-                await _unitOfWork.IngredientUnits.CreateAsync(ingredientUnit, cancellationToken);
-
-                //Add the ingredient to list to return it
-                ingredients.Add(ingredient);
+                await _unitOfWork.IngredientUnits.AddAsync(ingredientUnit, cancellationToken);
             }
 
             //Save all changes
@@ -109,19 +129,22 @@ namespace DessertApp.Application.IngredientServices
             return await _unitOfWork.Ingredients.GetAllAsync(cancellationToken);
         }
 
-        public async Task<Ingredient> GetIngredientByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Ingredients.GetByIdAsync(id, cancellationToken);
         }
 
-        public async Task<IngredientUnit> GetIngredientUnitByIdAsync(int id, CancellationToken cancellationToken)
+        public async Task<IngredientUnit?> GetIngredientUnitByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _unitOfWork.IngredientUnits.GetByIdAsync(id, cancellationToken);
         }
 
-        public async Task<Ingredient> GetIngredientWithUnitsAsync(int id, CancellationToken cancellationToken)
+        public async Task<Ingredient?> GetIngredientWithUnitsAsync(int id, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.GetIngredientWithUnitsAsync(id, cancellationToken);
+            return await _unitOfWork.Ingredients.GetByIdWithDetailsAsync(
+                id,
+                cancellationToken,
+                ingredient => ingredient.IngredientUnit!);
         }
 
         public async Task<List<IngredientUnitImportDto>> ImportIngredientsFromExternalSourceAsync(Stream source, CancellationToken cancellationToken)

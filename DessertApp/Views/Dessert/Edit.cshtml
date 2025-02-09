@@ -1,0 +1,67 @@
+﻿@using DessertApp.ViewModels.DomainVM
+@model DessertEditVM
+
+@{
+    ViewData["Title"] = "Edit Dessert";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" name="Id" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Name">Name</label>
+        <input type="text" class="form-control" id="Name" name="Name" asp-for="Name" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description">Description</label>
+        <input type="text" class="form-control" id="Description" name="Description" asp-for="Description" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Price">Price</label>
+        <input class="form-control"
+               name="Price"
+               asp-for="Price"
+               placeholder="Enter a value (e.g. 10.5)" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Stock">Stock</label>
+        <input type="number" class="form-control" id="Stock" name="Stock" asp-for="Stock" />
+        <span asp-validation-for="Stock" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="IsAvailable"></label>
+        <input asp-for="IsAvailable" type="checkbox" />
+        <span asp-validation-for="IsAvailable" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="AnnualDemand">Annual Demand</label>
+        <input type="number" class="form-control" id="AnnualDemand" name="AnnualDemand" asp-for="AnnualDemand" />
+        <span asp-validation-for="AnnualDemand" class="text-danger"></span>
+    </div>
+
+    <div class="form-group"> 
+        <label asp-for="SelectedCategory">Select a category</label>
+        <select asp-for="SelectedCategory" class="form-control" asp-items="@Model.DessertCategories">
+            
+        </select>
+        <span asp-validation-for="SelectedCategory" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </div>
+</form>
+
+<a href="@Url.Action("Index", "Dessert")" class="btn btn-secondary">Back to List</a>
+

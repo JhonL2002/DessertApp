@@ -1,0 +1,34 @@
+﻿@using DessertApp.Models.Entities
+@model IEnumerable<DessertIngredient>
+
+@{
+    ViewData["Title"] = "Desserts";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<a href="@Url.Action("Create", "DessertIngredient")" class="btn btn-primary">Create New Recipe</a>
+
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Dessert</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dessert in Model)
+        {
+            <tr>
+                <td>@dessert.Dessert.Name</td>
+                 <td>
+                    <a href="@Url.Action("Details", "DessertIngredient", new { dessertId = dessert.DessertId })" class="btn btn-info btn-sm">Details</a>
+                    <a href="@Url.Action("Edit", "DessertIngredient", new { dessertId = dessert.DessertId })" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="@Url.Action("Delete", "DessertIngredient", new { dessertId = dessert.DessertId })" class="btn btn-danger btn-sm">Delete</a>
+                 </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

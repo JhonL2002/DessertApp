@@ -4,6 +4,7 @@ using DessertApp.Infraestructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DessertApp.Infraestructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250204211522_AddIsReversiblePropertyToUnitConversion")]
+    partial class AddIsReversiblePropertyToUnitConversion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,7 +159,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasIndex("DessertCategoryId");
 
-                    b.ToTable("Desserts", (string)null);
+                    b.ToTable("Desserts");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.DessertCategory", b =>
@@ -179,7 +182,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DessertCategories", (string)null);
+                    b.ToTable("DessertCategories");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.DessertIngredient", b =>
@@ -211,7 +214,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("DessertIngredients", (string)null);
+                    b.ToTable("DessertIngredients");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.Ingredient", b =>
@@ -239,7 +242,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients", (string)null);
+                    b.ToTable("Ingredients");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.IngredientUnit", b =>
@@ -280,7 +283,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasIndex("UnitId");
 
-                    b.ToTable("IngredientUnits", (string)null);
+                    b.ToTable("IngredientUnits");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.MeasurementUnit", b =>
@@ -298,7 +301,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Units", (string)null);
+                    b.ToTable("Units");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.PurchaseOrder", b =>
@@ -324,7 +327,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PurchaseOrders", (string)null);
+                    b.ToTable("PurchaseOrders");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.PurchaseOrderDetail", b =>
@@ -358,7 +361,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PurchaseOrderDetails", (string)null);
+                    b.ToTable("PurchaseOrderDetails");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.Sale", b =>
@@ -387,7 +390,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Sales", (string)null);
+                    b.ToTable("Sales");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.SaleDetail", b =>
@@ -417,7 +420,7 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasIndex("SaleId");
 
-                    b.ToTable("SaleDetails", (string)null);
+                    b.ToTable("SaleDetails");
                 });
 
             modelBuilder.Entity("DessertApp.Models.Entities.UnitConversion", b =>
@@ -449,12 +452,12 @@ namespace DessertApp.Infraestructure.Migrations
 
                     b.HasIndex("ToUnitId");
 
-                    b.ToTable("UnitConversion", (string)null);
+                    b.ToTable("UnitConversion");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = -1,
                             ConversionFactor = 1000m,
                             FromUnitId = 2,
                             IsReversible = true,
@@ -462,7 +465,7 @@ namespace DessertApp.Infraestructure.Migrations
                         },
                         new
                         {
-                            Id = 2,
+                            Id = -2,
                             ConversionFactor = 0.001m,
                             FromUnitId = 5,
                             IsReversible = true,
@@ -470,7 +473,7 @@ namespace DessertApp.Infraestructure.Migrations
                         },
                         new
                         {
-                            Id = 3,
+                            Id = -3,
                             ConversionFactor = 1000m,
                             FromUnitId = 1,
                             IsReversible = true,
@@ -478,7 +481,7 @@ namespace DessertApp.Infraestructure.Migrations
                         },
                         new
                         {
-                            Id = 4,
+                            Id = -4,
                             ConversionFactor = 0.001m,
                             FromUnitId = 6,
                             IsReversible = true,
@@ -486,7 +489,7 @@ namespace DessertApp.Infraestructure.Migrations
                         },
                         new
                         {
-                            Id = 5,
+                            Id = -5,
                             ConversionFactor = 30m,
                             FromUnitId = 3,
                             IsReversible = true,
@@ -494,7 +497,7 @@ namespace DessertApp.Infraestructure.Migrations
                         },
                         new
                         {
-                            Id = 6,
+                            Id = -6,
                             ConversionFactor = 0.033m,
                             FromUnitId = 7,
                             IsReversible = true,

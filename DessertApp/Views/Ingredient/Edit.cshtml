@@ -27,7 +27,6 @@
         <div class="card mb-3">
             <div class="card-body">
             
-                <!-- Campo oculto para el ID de la unidad -->
                 <input type="hidden" name="IngredientUnitVM.Id" asp-for="IngredientUnitVM.Id" />
 
                 <select asp-for="IngredientUnitVM.SelectedUnitId" class="form-control" asp-items="@Model.AvailableUnits"></select>
@@ -39,28 +38,31 @@
                        asp-for="IngredientUnitVM.ItemsPerUnit" />
                     <span asp-validation-for="IngredientUnitVM.ItemsPerUnit" class="text-danger"></span>
                 </div>
+
                 <div class="form-group">
                     <label>Cost Per Unit</label>
                     <input class="form-control" 
                        name="IngredientUnitVM.CostPerUnit" 
                        asp-for="IngredientUnitVM.CostPerUnit"
-                               placeholder="Enter a value (e.g. 10,5)" />
+                               placeholder="Enter a value (e.g. 10.5)" />
                     <span asp-validation-for="IngredientUnitVM.CostPerUnit" class="text-danger"></span>
                 </div>
+
                 <div class="form-group">
                     <label>Ordering Cost</label>
                     <input class="form-control" 
                        name="IngredientUnitVM.OrderingCost" 
                        asp-for="IngredientUnitVM.OrderingCost"
-                               placeholder="Enter a value (e.g. 10,5)" />
+                               placeholder="Enter a value (e.g. 10.5)" />
                     <span asp-validation-for="IngredientUnitVM.OrderingCost" class="text-danger"></span>
                 </div>
+
                 <div class="form-group">
                     <label>Monthly Holding Cost Rate</label>
                     <input class="form-control" 
                        name="IngredientUnitVM.MonthlyHoldingCostRate" 
                        asp-for="IngredientUnitVM.MonthlyHoldingCostRate"
-                               placeholder="Enter a value (e.g. 10,5)" />
+                               placeholder="Enter a value (e.g. 10.5)" />
                     <span asp-validation-for="IngredientUnitVM.MonthlyHoldingCostRate" class="text-danger"></span>
                 </div>
                 <div class="form-group">

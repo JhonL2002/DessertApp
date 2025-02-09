@@ -1,0 +1,50 @@
+﻿@using DessertApp.ViewModels.DomainVM
+@model List<DessertIngredientVM>
+
+@{
+    ViewData["Title"] = "Create recipe";
+    var firstDessert = Model.FirstOrDefault();
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post">
+    <div id="ingredients-container">
+        <div class="ingredient-group">
+            <label>Dessert:</label>
+            <select id="dessert-selector" name="models[0].DessertId" class="form-control" asp-for="@firstDessert!.DessertId" asp-items="@firstDessert?.Desserts"></select>
+
+            <label>Ingredient:</label>
+            <select name="models[0].IngredientId" asp-for="@firstDessert!.IngredientId" class="form-control" asp-items="@firstDessert?.Ingredients"></select>
+
+            <label>Quantity:</label>
+            <input asp-for="@firstDessert!.QuantityRequired" name="models[0].QuantityRequired" class="form-control" type="text" />
+
+            <label>Measurement Unit:</label>
+            <select name="models[0].UnitId" asp-for="@firstDessert!.UnitId" class="form-control" asp-items="@firstDessert?.Units"></select>
+        </div>
+    </div>
+
+    <button type="button" id="add-ingredient" class="btn btn-secondary">Add ingredient</button>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<!-- Template for new ingredients -->
+<template id="ingredient-template">
+    <div class="ingredient-group">
+        <label>Dessert:</label>
+        <select class="form-control dessert-select" disabled></select>
+        <input type="hidden" class="hidden-dessert" />
+
+        <label>Ingredient:</label>
+        <select class="form-control ingredient-select"></select>
+
+        <label>Quantity:</label>
+        <input class="form-control quantity-input" type="text" />
+
+        <label>Measurement Unit:</label>
+        <select class="form-control unit-select"></select>
+
+        <button type="button" class="btn btn-danger remove-ingredient">Remove</button>
+    </div>
+</template>

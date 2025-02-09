@@ -1,0 +1,24 @@
+﻿@using DessertApp.Models.Entities
+@model IEnumerable<DessertIngredient>
+
+@{
+    ViewData["Title"] = "Delete Recipe";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+@foreach (var item in Model)
+{
+    <p>@item.DessertId</p>
+}
+
+<p>Are you sure you want to delete this recipe?</p>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" name="dessertId" value="@Model.FirstOrDefault()?.DessertId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+</form>
+
+<a href="@Url.Action("Index", "DessertIngredient")" class="btn btn-secondary">Cancel</a>
+
+

@@ -1,0 +1,29 @@
+﻿@using DessertApp.Models.Entities
+@model IEnumerable<DessertIngredient>
+
+@{
+    ViewData["Title"] = "Dessert Recipe";
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ingredient</th>
+                <th>Quantity</th>
+                <th>Unit</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Ingredient.Name</td>
+                    <td>@item.QuantityRequired.ToString("0.##")</td>                                                     
+                    <td>@item.Unit.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

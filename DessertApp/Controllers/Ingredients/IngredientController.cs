@@ -10,15 +10,15 @@ namespace DessertApp.Controllers.Ingredients
     [Authorize(Roles = "Admin")]
     public class IngredientController : Controller
     {
-        private readonly IIngredientService _ingredientService;
-        private readonly IMeasurementUnitService _measurementUnitService;
+        private readonly IIngredientRepository _ingredientService;
+        private readonly IMeasurementUnitRepository _measurementUnitService;
         private readonly ILogger<IngredientController> _logger;
 
         public IngredientController(
-            IIngredientService ingredientService,
-            IMeasurementUnitService measurementUnitService,
+            IIngredientRepository ingredientService,
+            IMeasurementUnitRepository measurementUnitService,
             ILogger<IngredientController> logger
-        )
+            )
         {
             _ingredientService = ingredientService;
             _measurementUnitService = measurementUnitService;
@@ -35,6 +35,7 @@ namespace DessertApp.Controllers.Ingredients
         [HttpPost]
         public async Task<IActionResult> Import(IFormFile file, CancellationToken cancellationToken)
         {
+            
             if (file == null || file.Length == 0)
             {
                 ModelState.AddModelError("File", "Please select a valid file");

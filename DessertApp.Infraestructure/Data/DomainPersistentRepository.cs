@@ -17,17 +17,24 @@ namespace DessertApp.Infraestructure.Data
             _dbSet = context.Set<T>();
         }
 
-        public async Task<T> CreateAsync(T entity, CancellationToken cancellationToken)
+        public async Task<T> AddAsync(T entity, CancellationToken cancellationToken)
         {
             //First, add main entity
             await _dbSet.AddAsync(entity, cancellationToken);
-
-            //Commit changes
-            await _context.SaveChangesAsync(cancellationToken);
             return entity;
         }
 
-        public async Task<T> DeleteAsync(T entity, CancellationToken cancellationToken, params object[] releatedEntities)
+        public async Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
+        {
+            await _dbSet.AddRangeAsync(entities, cancellationToken);
+        }
+
+        public void Attach(T entity, CancellationToken cancellationToken)
+        {
+            _dbSet.Attach(entity);
+        }
+
+        public Task DeleteAsync(T entity, CancellationToken cancellationToken, params object[] releatedEntities)
         {
             //Delete releated entities
             foreach (var releatedEntity in releatedEntities)
@@ -39,8 +46,18 @@ namespace DessertApp.Infraestructure.Data
             }
             //Then, delete main entity
             _dbSet.Remove(entity);
-            await _context.SaveChangesAsync(cancellationToken);
-            return entity;
+            return Task.CompletedTask;
+        }
+
+        public Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
+        {
+            if (entities == null || !entities.Any())
+            {
+                throw new ArgumentException("The entities collection cannot be null or be empty");
+            }
+
+            _dbSet.RemoveRange(entities);
+            return Task.CompletedTask;
         }
 
         public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken)
@@ -48,7 +65,28 @@ namespace DessertApp.Infraestructure.Data
             return await _dbSet.ToListAsync(cancellationToken);
         }
 
-        public async Task<T> GetByFieldAsync(string fieldName, string value, CancellationToken cancellationToken)
+        public async Task<IEnumerable<T>> GetAllWithDetailsAsync(
+            Expression<Func<T, bool>>? filter = null,
+            CancellationToken cancellationToken = default,
+            Func<IQueryable<T>, IQueryable<T>>? include = null)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (include != null)
+            {
+                query = include(query);
+
+            }
+
+            return await query.ToListAsync(cancellationToken);
+        }
+
+        public async Task<T?> GetByFieldAsync(string fieldName, string value, CancellationToken cancellationToken)
         {
             var parameter = Expression.Parameter(typeof(T), "x");
             var property = Expression.Property(parameter, fieldName);
@@ -58,16 +96,15 @@ namespace DessertApp.Infraestructure.Data
 
             return await _dbSet
                 .Where(predicate)
-                .FirstOrDefaultAsync(cancellationToken)
-                ?? throw new KeyNotFoundException($"Entity with {fieldName} = {value} not found.");
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<T> GetByIdAsync(TKey id, CancellationToken cancellationToken)
+        public async Task<T?> GetByIdAsync(TKey id, CancellationToken cancellationToken)
         {
-            return (await _dbSet.FindAsync([id], cancellationToken))!;
+            return await _dbSet.FindAsync([id], cancellationToken);
         }
 
-        public async Task<T> GetByIdWithDetailsAsync(TKey id, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdWithDetailsAsync(TKey id, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _dbSet;
             foreach (var include in includes)
@@ -79,13 +116,16 @@ namespace DessertApp.Infraestructure.Data
                 ?? throw new KeyNotFoundException($"Entity with Id {id} not found.");
         }
 
-        public async Task<T> UpdateAsync(T entity, CancellationToken cancellationToken)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        {
+            return await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public Task UpdateAsync(T entity, CancellationToken cancellationToken)
         {
             //Update main entity
             _dbSet.Update(entity);
-
-            await _context.SaveChangesAsync(cancellationToken);
-            return entity;
+            return Task.CompletedTask;
         }
     }
 }

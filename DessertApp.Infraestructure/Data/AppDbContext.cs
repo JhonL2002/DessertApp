@@ -2,7 +2,6 @@
 using DessertApp.Models.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 
 namespace DessertApp.Infraestructure.Data
 {
@@ -128,7 +127,7 @@ namespace DessertApp.Infraestructure.Data
                     .HasPrecision(18, 2);
 
                 entity.HasOne(di => di.Dessert)
-                    .WithMany()
+                    .WithMany(d => d.DessertIngredients)
                     .HasForeignKey(di => di.DessertId)
                     .OnDelete(DeleteBehavior.Restrict);
 
@@ -229,6 +228,38 @@ namespace DessertApp.Infraestructure.Data
                     .HasMaxLength(50);
             });
 
+            //UnitConversion
+            builder.Entity<UnitConversion>(entity =>
+            {
+                entity.HasKey(uc => uc.Id);
+
+                entity.HasOne(uc => uc.FromUnit)
+                    .WithMany()
+                    .HasForeignKey(uc => uc.FromUnitId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(uc => uc.ToUnit)
+                    .WithMany()
+                    .HasForeignKey(uc => uc.ToUnitId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(uc => uc.ConversionFactor)
+                    .HasPrecision(18, 2);
+
+                entity.Property(uc => uc.IsReversible)
+                    .HasDefaultValue(true);
+
+                entity.HasData(
+                    new UnitConversion { Id = 1, FromUnitId = 2, ToUnitId = 5, ConversionFactor = 1000, IsReversible = true }, // Kg -> g
+                    new UnitConversion { Id = 2, FromUnitId = 5, ToUnitId = 2, ConversionFactor = 0.001m, IsReversible = true }, // g -> Kg
+
+                    new UnitConversion { Id = 3, FromUnitId = 1, ToUnitId = 6, ConversionFactor = 1000, IsReversible = true }, // l -> ml
+                    new UnitConversion { Id = 4, FromUnitId = 6, ToUnitId = 1, ConversionFactor = 0.001m, IsReversible = true }, // ml -> l 
+
+                    new UnitConversion { Id = 5, FromUnitId = 3, ToUnitId = 7, ConversionFactor = 30, IsReversible = true}, // bucket -> unit
+                    new UnitConversion { Id = 6, FromUnitId = 7, ToUnitId = 3, ConversionFactor = 0.033m, IsReversible = true } // unit -> bucket
+                );
+            });
             base.OnModelCreating(builder);
         }
     }
