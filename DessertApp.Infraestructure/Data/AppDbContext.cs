@@ -139,7 +139,7 @@ namespace DessertApp.Infraestructure.Data
                 entity.HasOne(di => di.Ingredient)
                     .WithMany()
                     .HasForeignKey(di => di.IngredientId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             //PurchaseOrder

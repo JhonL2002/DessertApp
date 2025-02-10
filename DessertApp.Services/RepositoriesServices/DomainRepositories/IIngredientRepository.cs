@@ -6,8 +6,8 @@ namespace DessertApp.Services.RepositoriesServices.DomainRepositories
     public interface IIngredientRepository
     {
         Task<IEnumerable<Ingredient>> GetAllIngredientsAsync(CancellationToken cancellationToken);
+        Task<IEnumerable<Ingredient>> GetAllIngredientsWithDetailsAsync(CancellationToken cancellationToken);
         Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken cancellationToken);
-        Task<IngredientUnit?> GetIngredientUnitByIdAsync(int id, CancellationToken cancellationToken);
         Task<Ingredient?> GetIngredientWithUnitsAsync(int id, CancellationToken cancellationToken);
         Task<Ingredient> CreateIngredientAsync(Ingredient ingredient, IngredientUnit ingredientUnit, CancellationToken cancellationToken);
         Task<List<IngredientUnitImportDto>> ImportIngredientsFromExternalSourceAsync(Stream source, CancellationToken cancellationToken);

@@ -29,7 +29,10 @@
             
                 <input type="hidden" name="IngredientUnitVM.Id" asp-for="IngredientUnitVM.Id" />
 
-                <select asp-for="IngredientUnitVM.SelectedUnitId" class="form-control" asp-items="@Model.AvailableUnits"></select>
+                <div class="form-control">
+                    <label>Measurement Unit</label>
+                    <select asp-for="IngredientUnitVM.SelectedUnitId" class="form-control" asp-items="@Model.AvailableUnits"></select>
+                </div>
 
                 <div class="form-group">
                     <label>Items Per Unit</label>

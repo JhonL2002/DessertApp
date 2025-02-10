@@ -13,7 +13,6 @@ namespace DessertApp.Services.RepositoriesServices
         Task<T?> GetByFieldAsync(string fieldName, string value, CancellationToken cancellationToken);
         Task DeleteAsync(T entity, CancellationToken cancellationToken, params object[] releatedEntities);
         Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken);
-        //Task<IEnumerable<T>> GetAllWithDetailsAsync(CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes);
         Task<IEnumerable<T>> GetAllWithDetailsAsync(Expression<Func<T, bool>>? filter = null, CancellationToken cancellationToken = default, Func<IQueryable<T>, IQueryable<T>>? include = null);
         Task<T?> GetByIdWithDetailsAsync(TKey id, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes);
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

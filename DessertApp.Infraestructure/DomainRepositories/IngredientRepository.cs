@@ -3,11 +3,7 @@ using DessertApp.Services.DTOs;
 using DessertApp.Services.ImportDataServices;
 using DessertApp.Services.RepositoriesServices.DomainRepositories;
 using DessertApp.Services.UnitOfWorkServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DessertApp.Infraestructure.DomainRepositories
 {
@@ -54,17 +50,17 @@ namespace DessertApp.Infraestructure.DomainRepositories
                 var existingIngredient = await _unitOfWork.Ingredients.GetByFieldAsync("Name", dto.IngredientName, cancellationToken);
                 if (existingIngredient != null)
                 {
-                    //If ingredient exists, don't attach into EF
-                    _unitOfWork.Ingredients.Attach(existingIngredient, cancellationToken);
+                    // If it exists, update this
+                    existingIngredient.Stock = dto.Stock ?? existingIngredient.Stock;
+                    existingIngredient.IsAvailable = (dto.Stock ?? existingIngredient.Stock) > 0;
 
-                    //If ingredient exists, add to list an continue
-                    ingredients.Add(existingIngredient);
-                    continue;
+                    // Set ingredient as modified
+                    await _unitOfWork.Ingredients.UpdateAsync(existingIngredient, cancellationToken);
                 }
                 else
                 {
                     //Create a new ingredient if not exists
-                    var ingredient = new Ingredient
+                    existingIngredient = new Ingredient
                     {
                         Name = dto.IngredientName,
                         Stock = dto.Stock ?? 0,
@@ -72,29 +68,46 @@ namespace DessertApp.Infraestructure.DomainRepositories
                     };
 
                     //Save new ingredient to generate Id
-                    await _unitOfWork.Ingredients.AddAsync(ingredient, cancellationToken);
-                    await _unitOfWork.SaveChangesAsync(cancellationToken);
-                    ingredients.Add(ingredient);
-
-                    existingIngredient = ingredient;
+                    await _unitOfWork.Ingredients.AddAsync(existingIngredient, cancellationToken);
                 }
+
+                // Save changes after add or update
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                ingredients.Add(existingIngredient);
+
                 //Get MeasurementUnits
                 var measurementUnit = await _unitOfWork.MeasurementUnits.GetByFieldAsync("Name", dto.UnitName, cancellationToken) ?? throw new InvalidOperationException($"The measurement unit '{dto.UnitName}' does not exist");
 
-                //Create and associate the ingredient with unit
-                var ingredientUnit = new IngredientUnit
-                {
-                    IngredientId = existingIngredient.Id,
-                    UnitId = measurementUnit!.Id,
-                    ItemsPerUnit = dto.ItemsPerUnit,
-                    CostPerUnit = dto.CostPerUnit,
-                    OrderingCost = dto.OrderingCost,
-                    MonthlyHoldingCostRate = dto.MonthlyHoldingCostRate,
-                    AnnualDemand = dto.AnnualDemand,
-                };
+                //Create or update the relationship with ingredient unit
+                var existingIngredientUnit = await GetIngredientWithUnitsAsync(existingIngredient.Id, cancellationToken);
 
-                //Register IngredientUnit
-                await _unitOfWork.IngredientUnits.AddAsync(ingredientUnit, cancellationToken);
+                if (existingIngredientUnit != null)
+                {
+                    existingIngredientUnit.IngredientUnit!.ItemsPerUnit = dto.ItemsPerUnit;
+                    existingIngredientUnit.IngredientUnit.CostPerUnit = dto.CostPerUnit;
+                    existingIngredientUnit.IngredientUnit.OrderingCost = dto.OrderingCost;
+                    existingIngredientUnit.IngredientUnit.MonthlyHoldingCostRate = dto.MonthlyHoldingCostRate;
+                    existingIngredientUnit.IngredientUnit.AnnualDemand = dto.AnnualDemand;
+
+                    await _unitOfWork.IngredientUnits.UpdateAsync(existingIngredientUnit.IngredientUnit!, cancellationToken);
+                }
+                else
+                {
+                    // If not exists, create a new
+                    var ingredientUnit = new IngredientUnit
+                    {
+                        IngredientId = existingIngredient.Id,
+                        UnitId = measurementUnit.Id,
+                        ItemsPerUnit = dto.ItemsPerUnit,
+                        CostPerUnit = dto.CostPerUnit,
+                        OrderingCost = dto.OrderingCost,
+                        MonthlyHoldingCostRate = dto.MonthlyHoldingCostRate,
+                        AnnualDemand = dto.AnnualDemand
+                    };
+
+                    //Add new IngredientUnit
+                    await _unitOfWork.IngredientUnits.AddAsync(ingredientUnit, cancellationToken);
+                }
             }
 
             //Save all changes
@@ -129,14 +142,17 @@ namespace DessertApp.Infraestructure.DomainRepositories
             return await _unitOfWork.Ingredients.GetAllAsync(cancellationToken);
         }
 
+        public async Task<IEnumerable<Ingredient>> GetAllIngredientsWithDetailsAsync(CancellationToken cancellationToken)
+        {
+            return await _unitOfWork.Ingredients.GetAllWithDetailsAsync(
+                filter: null,
+                cancellationToken: cancellationToken,
+                query => query.Include(i => i.IngredientUnit));
+        }
+
         public async Task<Ingredient?> GetIngredientByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _unitOfWork.Ingredients.GetByIdAsync(id, cancellationToken);
-        }
-
-        public async Task<IngredientUnit?> GetIngredientUnitByIdAsync(int id, CancellationToken cancellationToken)
-        {
-            return await _unitOfWork.IngredientUnits.GetByIdAsync(id, cancellationToken);
         }
 
         public async Task<Ingredient?> GetIngredientWithUnitsAsync(int id, CancellationToken cancellationToken)

@@ -112,8 +112,7 @@ namespace DessertApp.Infraestructure.Data
                 query = query.Include(include);
             }
 
-            return await query.FirstOrDefaultAsync(entity => EF.Property<TKey>(entity, "Id")!.Equals(id), cancellationToken)
-                ?? throw new KeyNotFoundException($"Entity with Id {id} not found.");
+            return await query.FirstOrDefaultAsync(entity => EF.Property<TKey>(entity, "Id")!.Equals(id), cancellationToken);
         }
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)

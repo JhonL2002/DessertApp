@@ -32,6 +32,6 @@ namespace DessertApp.Models.Entities
         public ICollection<DessertIngredient> DessertIngredients { get; set; }
 
         [NotMapped]
-        public bool IsLowDemand => AnnualDemand.HasValue && AnnualDemand < 100 ;
+        public bool IsLowDemand => AnnualDemand.HasValue && AnnualDemand < 2000;
     }
 }

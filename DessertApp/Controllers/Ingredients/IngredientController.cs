@@ -168,7 +168,8 @@ namespace DessertApp.Controllers.Ingredients
                     CostPerUnit = ingredient.IngredientUnit?.CostPerUnit,
                     OrderingCost = ingredient.IngredientUnit?.OrderingCost,
                     MonthlyHoldingCostRate = ingredient.IngredientUnit?.MonthlyHoldingCostRate,
-                    AnnualDemand = ingredient.IngredientUnit?.AnnualDemand
+                    AnnualDemand = ingredient.IngredientUnit?.AnnualDemand,
+                    SelectedUnitId = ingredient.IngredientUnit!.UnitId
                 },
                 AvailableUnits =
                 new SelectList(
