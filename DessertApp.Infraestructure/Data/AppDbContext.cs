@@ -16,6 +16,7 @@ namespace DessertApp.Infraestructure.Data
         public DbSet<Dessert> Desserts {  get; set; }
         public DbSet<DessertCategory> DessertCategories { get; set; }
         public DbSet<Ingredient> Ingredients { get; set; }
+        public DbSet<InventoryAnalysis> InventoryAnalyses { get; set; }
         public DbSet<DessertIngredient> DessertIngredients { get; set; }
         public DbSet<Sale> Sales { get; set; }
         public DbSet<SaleDetail> SaleDetails { get; set; }
@@ -259,6 +260,36 @@ namespace DessertApp.Infraestructure.Data
                     new UnitConversion { Id = 5, FromUnitId = 3, ToUnitId = 7, ConversionFactor = 30, IsReversible = true}, // bucket -> unit
                     new UnitConversion { Id = 6, FromUnitId = 7, ToUnitId = 3, ConversionFactor = 0.033m, IsReversible = true } // unit -> bucket
                 );
+            });
+
+            //InventoryAnalysis
+            builder.Entity<InventoryAnalysis>(entity =>
+            {
+                entity.HasKey(ia => ia.Id);
+
+                entity.HasOne(ia => ia.Ingredient)
+                    .WithMany(i => i.InventoryAnalyses)
+                    .HasForeignKey(iu => iu.IngredientId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.Property(ia => ia.IngredientName)
+                    .IsRequired()
+                    .HasMaxLength(150);
+
+                entity.Property(ia => ia.OrderFrequency)
+                    .HasPrecision(18, 2);
+
+                entity.Property(ia => ia.OptimalOrderingPeriod)
+                    .HasPrecision(18, 2);
+
+                entity.Property(ia => ia.OrderingCost)
+                    .HasPrecision(18, 2);
+
+                entity.Property(ia => ia.AnnualDemand)
+                    .HasPrecision(18, 2);
+
+                entity.Property(ia => ia.CostOfMaintainingUnitsInInventory)
+                    .HasPrecision(18, 2);
             });
             base.OnModelCreating(builder);
         }

@@ -1,8 +1,41 @@
-﻿@{
+﻿@using DessertApp.Infraestructure.IdentityModels
+@using DessertApp.Services.Infraestructure.AccountServices
+@using DessertApp.Services.Infraestructure.UserManagerServices
+@using Microsoft.AspNetCore.Identity
+@inject IUserManagerService<IdentityResult,AppUser,IdentityOptions> UserManagerService
+@inject IAuthenticationService<Microsoft.AspNetCore.Identity.SignInResult, IdentityResult, AppUser> AuthenticationService
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<h1>@ViewData["Title"]</h1>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+@if (ViewBag.ShowAlert == true && User.IsInRole("Admin"))
+{
+    <div class="alert-warning text-center" role="alert">
+        <strong>Attention!</strong> There are not ingredients into stock
+        <a href="@Url.Action("Import", "Production")" class="btn btn-primary btn-sm">
+            Import Annual Demand
+        </a>
+    </div>
+}
+else if (ViewBag.ShowOrderAlert == true && User.IsInRole("Admin"))
+{
+    <div class="alert-info text-center" role="alert">
+        <strong>Good news!</strong> The annual demand has been imported. Do you want to generate the first order?
+        <a href="@Url.Action("GenerateInitialOrder", "Orders")" class="btn btn-success btn-sm">
+            Generate First Order
+        </a>
+    </div>
+}

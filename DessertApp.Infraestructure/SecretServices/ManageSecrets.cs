@@ -1,7 +1,7 @@
 ﻿using Azure.Core;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using DessertApp.Services.SecretServices;
+using DessertApp.Services.Infraestructure.SecretServices;
 using Microsoft.Extensions.Logging;
 
 namespace DessertApp.Infraestructure.SecretServices

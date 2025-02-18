@@ -1,4 +1,4 @@
-﻿using DessertApp.Services.RepositoriesServices;
+﻿using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

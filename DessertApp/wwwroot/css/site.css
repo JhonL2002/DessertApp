@@ -25,14 +25,14 @@ body {
     transition: opacity 1s ease-out;
 }
 
-/* Resalta el nuevo formulario con un borde amarillo */
+
 .highlight {
     border: 2px solid #FFD700;
     background-color: #fff8dc;
     transition: background-color 1.5s, border 1.5s;
 }
 
-/* Animación de desaparición cuando se elimina un ingrediente */
+
 .fade-out {
     opacity: 0;
     transition: opacity 0.5s;

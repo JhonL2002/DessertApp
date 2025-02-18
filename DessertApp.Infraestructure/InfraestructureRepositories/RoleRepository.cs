@@ -1,6 +1,6 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
-using DessertApp.Services.Repositories;
-using DessertApp.Services.RoleStoreServices;
+using DessertApp.Services.Infraestructure.RepositoriesServices.IdentityRepositories;
+using DessertApp.Services.Infraestructure.RoleStoreServices;
 using Microsoft.AspNetCore.Identity;
 
 namespace DessertApp.Infraestructure.Repositories

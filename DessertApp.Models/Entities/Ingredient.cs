@@ -16,5 +16,7 @@ namespace DessertApp.Models.Entities
         public bool IsAvailable { get; set; }
 
         public IngredientUnit? IngredientUnit { get; set; }
+
+        public ICollection<InventoryAnalysis> InventoryAnalyses { get; set; } = new List<InventoryAnalysis>();
     }
 }

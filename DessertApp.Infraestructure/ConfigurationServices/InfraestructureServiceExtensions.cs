@@ -15,21 +15,22 @@ using DessertApp.Infraestructure.RoleServices;
 using DessertApp.Infraestructure.SecretServices;
 using DessertApp.Infraestructure.UnitOfWorkServices;
 using DessertApp.Infraestructure.UserServices;
-using DessertApp.Services.AccountServices;
-using DessertApp.Services.CacheServices;
-using DessertApp.Services.ConfigurationServices;
-using DessertApp.Services.DataInitializerServices;
+using DessertApp.Models.Entities;
 using DessertApp.Services.DTOs;
-using DessertApp.Services.EmailServices;
 using DessertApp.Services.IEmailServices;
-using DessertApp.Services.ImportDataServices;
-using DessertApp.Services.Repositories;
-using DessertApp.Services.RepositoriesServices;
-using DessertApp.Services.RepositoriesServices.DomainRepositories;
-using DessertApp.Services.RoleStoreServices;
-using DessertApp.Services.SecretServices;
-using DessertApp.Services.UnitOfWorkServices;
-using DessertApp.Services.UserManagerServices;
+using DessertApp.Services.Infraestructure.AccountServices;
+using DessertApp.Services.Infraestructure.CacheServices;
+using DessertApp.Services.Infraestructure.ConfigurationServices;
+using DessertApp.Services.Infraestructure.DataInitializerServices;
+using DessertApp.Services.Infraestructure.EmailServices;
+using DessertApp.Services.Infraestructure.ImportDataServices;
+using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
+using DessertApp.Services.Infraestructure.RepositoriesServices.IdentityRepositories;
+using DessertApp.Services.Infraestructure.RoleStoreServices;
+using DessertApp.Services.Infraestructure.SecretServices;
+using DessertApp.Services.Infraestructure.UnitOfWorkServices;
+using DessertApp.Services.Infraestructure.UserManagerServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -128,6 +129,9 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             //MeasurementUnit Repositories
             services.AddScoped<IMeasurementUnitRepository, MeasurementUnitRepository>();
 
+            //UnitConversion Repositories
+            services.AddScoped<IUnitConversionRepository, UnitConversionRepository>();
+
             //UnitOfWork services
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -148,7 +152,8 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddTransient<IManageSecrets, ManageSecrets>();
 
             //Add external services to work with massive data (Import data from Excel)
-            services.AddScoped<IImportIngredient<IngredientUnitImportDto>, ImportIngredient>();
+            services.AddScoped<IImportData<IngredientUnitImportDto>, ImportIngredient>();
+            services.AddScoped<IImportData<DessertAnalysis>, ImportMonthlyDessertDemand>();
 
             return services;
         }

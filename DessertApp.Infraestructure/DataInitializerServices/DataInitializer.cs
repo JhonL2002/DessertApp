@@ -1,5 +1,5 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
-using DessertApp.Services.DataInitializerServices;
+using DessertApp.Services.Infraestructure.DataInitializerServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 namespace DessertApp.Infraestructure.DataInitializerServices

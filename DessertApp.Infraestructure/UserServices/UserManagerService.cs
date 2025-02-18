@@ -1,5 +1,5 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
-using DessertApp.Services.UserManagerServices;
+using DessertApp.Services.Infraestructure.UserManagerServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
@@ -72,6 +72,13 @@ namespace DessertApp.Infraestructure.UserServices
                 return (await _userManager.FindByIdAsync(id))!;
             }
             return null!;
+        }
+
+        public Task<bool> IsInRoleAsync(AppUser user, string role)
+        {
+            if (user == null) return Task.FromResult(false);
+
+            return _userManager.IsInRoleAsync(user, role);
         }
 
         public async Task<IdentityResult> ResetPasswordAsync(AppUser user, string token, string newPassword)

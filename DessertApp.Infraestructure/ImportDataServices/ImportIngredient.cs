@@ -1,10 +1,10 @@
 ﻿using ClosedXML.Excel;
 using DessertApp.Services.DTOs;
-using DessertApp.Services.ImportDataServices;
+using DessertApp.Services.Infraestructure.ImportDataServices;
 
 namespace DessertApp.Infraestructure.ImportDataServices
 {
-    public class ImportIngredient : IImportIngredient<IngredientUnitImportDto>
+    public class ImportIngredient : IImportData<IngredientUnitImportDto>
     {
         public async Task<List<IngredientUnitImportDto>> ImportFromExternalSourceAsync(Stream externalSource)
         {

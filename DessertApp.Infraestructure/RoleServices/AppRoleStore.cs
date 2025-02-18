@@ -1,6 +1,6 @@
 ﻿using DessertApp.Infraestructure.Data;
 using DessertApp.Infraestructure.IdentityModels;
-using DessertApp.Services.RoleStoreServices;
+using DessertApp.Services.Infraestructure.RoleStoreServices;
 using Mailjet.Client.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

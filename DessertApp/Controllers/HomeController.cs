@@ -1,6 +1,8 @@
-using DessertApp.Application.DessertServices;
-using DessertApp.Models.Entities;
+using DessertApp.Application.InventoryServices;
+using DessertApp.Infraestructure.IdentityModels;
+using DessertApp.Services.Infraestructure.UserManagerServices;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DessertApp.Controllers
@@ -8,19 +10,42 @@ namespace DessertApp.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly CalculationService _calculationService;
+        private readonly IUserManagerService<IdentityResult,AppUser,IdentityOptions> _userManagerService;
+        private readonly StockCheckerService _stockCheckerService;
 
-        public HomeController(ILogger<HomeController> logger, CalculationService calculationService)
+        public HomeController(ILogger<HomeController> logger, StockCheckerService stockCheckerService, IUserManagerService<IdentityResult, AppUser, IdentityOptions> userManagerService)
         {
             _logger = logger;
-            _calculationService = calculationService;
+            _stockCheckerService = stockCheckerService;
+            _userManagerService = userManagerService;
         }
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
-        {
-            var calculatedSum = await _calculationService.CalculateAnnualDessertDemand(cancellationToken);
-            Console.ForegroundColor = ConsoleColor.DarkCyan;
-            Console.WriteLine(calculatedSum);
+        { 
+            var user = await _userManagerService.GetUserAsync(User);
+            bool isAdmin = user != null && await _userManagerService.IsInRoleAsync(user, "Admin");
+
+            bool hasStock = isAdmin && await _stockCheckerService.HasZeroStockIngredientsAsync(cancellationToken);
+
+            bool hasInventoryAnalysis = isAdmin && await _stockCheckerService.HasInventoryAnalysisAsync(cancellationToken);
+
+            bool hasOrders = isAdmin && await _stockCheckerService.HasOrdersAsync(cancellationToken);
+
+            if (hasStock && !hasInventoryAnalysis)
+            {
+                ViewBag.ShowAlert = true;
+                ViewBag.ShowOrderAlert = false;
+            }else if (hasInventoryAnalysis && !hasOrders)
+            {
+                ViewBag.ShowAlert = false;
+                ViewBag.ShowOrderAlert = true;
+            }
+            else
+            {
+                ViewBag.ShowAlert = false;
+                ViewBag.ShowOrderAlert = false;
+            }
+            
             return View();
         }
 
