@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text;
-using DessertApp.Services.UserManagerServices;
 using DessertApp.Services.Enums;
 using DessertApp.ViewModels.AccountVM;
 using DessertApp.Application.Strategies;
+using DessertApp.Services.Infraestructure.UserManagerServices;
 
 namespace DessertApp.Controllers.Account
 {

@@ -1,4 +1,5 @@
 ﻿
+using DessertApp.Services.Infraestructure.EmailServices;
 using Mailjet.Client;
 using Mailjet.Client.Resources;
 using Newtonsoft.Json.Linq;

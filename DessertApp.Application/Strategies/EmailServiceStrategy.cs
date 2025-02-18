@@ -1,5 +1,5 @@
-﻿using DessertApp.Services.EmailServices;
-using DessertApp.Services.Enums;
+﻿using DessertApp.Services.Enums;
+using DessertApp.Services.Infraestructure.EmailServices;
 namespace DessertApp.Application.Strategies
 {
     public class EmailServiceStrategy<T> where T : class

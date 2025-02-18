@@ -1,8 +1,8 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Infraestructure.Utilities;
-using DessertApp.Services.EmailServices;
 using DessertApp.Services.Enums;
-using DessertApp.Services.UserManagerServices;
+using DessertApp.Services.Infraestructure.EmailServices;
+using DessertApp.Services.Infraestructure.UserManagerServices;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;

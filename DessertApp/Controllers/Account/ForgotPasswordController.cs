@@ -1,7 +1,7 @@
 ﻿using DessertApp.Application.Strategies;
 using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Services.Enums;
-using DessertApp.Services.UserManagerServices;
+using DessertApp.Services.Infraestructure.UserManagerServices;
 using DessertApp.ViewModels.AccountVM;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

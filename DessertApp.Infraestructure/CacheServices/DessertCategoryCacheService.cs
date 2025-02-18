@@ -1,6 +1,6 @@
 ﻿using DessertApp.Models.Entities;
-using DessertApp.Services.CacheServices;
-using DessertApp.Services.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.CacheServices;
+using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 

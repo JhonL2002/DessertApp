@@ -1,7 +1,7 @@
 ﻿using DessertApp.Infraestructure.Data;
 using DessertApp.Models.Entities;
-using DessertApp.Services.RepositoriesServices.DomainRepositories;
-using DessertApp.Services.UnitOfWorkServices;
+using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 ﻿using DessertApp.Infraestructure.IdentityModels;
-using DessertApp.Services.AccountServices;
-using DessertApp.Services.UserManagerServices;
+using DessertApp.Services.Infraestructure.AccountServices;
+using DessertApp.Services.Infraestructure.UserManagerServices;
 using DessertApp.ViewModels.AccountVM;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

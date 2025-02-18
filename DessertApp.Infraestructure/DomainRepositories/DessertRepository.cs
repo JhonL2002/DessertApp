@@ -1,8 +1,6 @@
 ﻿using DessertApp.Infraestructure.Data;
 using DessertApp.Models.Entities;
-using DessertApp.Services.Repositories;
-using DessertApp.Services.RepositoriesServices;
-using DessertApp.Services.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -56,6 +54,7 @@ namespace DessertApp.Infraestructure.DessertServices
                 include: query => query
                     .Include(d => d.DessertIngredients)
                         .ThenInclude(i => i.Ingredient)
+                            .ThenInclude(i => i.IngredientUnit)
                     .Include(d => d.DessertIngredients)
                         .ThenInclude(di => di.Unit)
             );

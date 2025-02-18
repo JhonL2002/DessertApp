@@ -1,6 +1,6 @@
 ﻿using DessertApp.Models.Entities;
-using DessertApp.Services.RepositoriesServices.DomainRepositories;
-using DessertApp.Services.UnitOfWorkServices;
+using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 
 namespace DessertApp.Application.MeasurementUnitServices
 {

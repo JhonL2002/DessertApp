@@ -1,5 +1,5 @@
 ﻿using DessertApp.Models.Entities;
-using DessertApp.Services.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
 using DessertApp.ViewModels.DomainVM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

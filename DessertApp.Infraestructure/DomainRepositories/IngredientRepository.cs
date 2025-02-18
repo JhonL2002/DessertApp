@@ -1,8 +1,8 @@
 ﻿using DessertApp.Models.Entities;
 using DessertApp.Services.DTOs;
-using DessertApp.Services.ImportDataServices;
-using DessertApp.Services.RepositoriesServices.DomainRepositories;
-using DessertApp.Services.UnitOfWorkServices;
+using DessertApp.Services.Infraestructure.ImportDataServices;
+using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace DessertApp.Infraestructure.DomainRepositories
@@ -10,9 +10,9 @@ namespace DessertApp.Infraestructure.DomainRepositories
     public class IngredientRepository : IIngredientRepository
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IImportIngredient<IngredientUnitImportDto> _importIngredient;
+        private readonly IImportData<IngredientUnitImportDto> _importIngredient;
 
-        public IngredientRepository(IUnitOfWork unitOfWork, IImportIngredient<IngredientUnitImportDto> importIngredient)
+        public IngredientRepository(IUnitOfWork unitOfWork, IImportData<IngredientUnitImportDto> importIngredient)
         {
             _unitOfWork = unitOfWork;
             _importIngredient = importIngredient;

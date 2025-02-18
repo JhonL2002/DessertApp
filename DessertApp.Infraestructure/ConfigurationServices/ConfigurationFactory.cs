@@ -1,5 +1,5 @@
 ﻿using DessertApp.Infraestructure.Data;
-using DessertApp.Services.ConfigurationServices;
+using DessertApp.Services.Infraestructure.ConfigurationServices;
 using Microsoft.Extensions.Configuration;
 
 namespace DessertApp.Infraestructure.ConfigurationServices

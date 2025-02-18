@@ -1,6 +1,6 @@
-﻿using DessertApp.Services.ConfigurationServices;
-using DessertApp.Services.EmailServices;
-using DessertApp.Services.SecretServices;
+﻿using DessertApp.Services.Infraestructure.ConfigurationServices;
+using DessertApp.Services.Infraestructure.EmailServices;
+using DessertApp.Services.Infraestructure.SecretServices;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
