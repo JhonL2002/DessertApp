@@ -23,5 +23,8 @@ namespace DessertApp.Models.Entities
 
         [Range(1, double.MaxValue)]
         public decimal Subtotal { get; set; }
+
+        public DateTime? NextOrderDate { get; set; }
+        public int RemainingOrders { get; set; }
     }
 }
