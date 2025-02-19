@@ -34,7 +34,7 @@ else if (ViewBag.ShowOrderAlert == true && User.IsInRole("Admin"))
 {
     <div class="alert-info text-center" role="alert">
         <strong>Good news!</strong> The annual demand has been imported. Do you want to generate the first order?
-        <a href="@Url.Action("GenerateInitialOrder", "Orders")" class="btn btn-success btn-sm">
+        <a href="@Url.Action("GenerateInitialOrder", "Order")" class="btn btn-success btn-sm">
             Generate First Order
         </a>
     </div>

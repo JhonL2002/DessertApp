@@ -122,6 +122,7 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddScoped<IDessertRepository, DessertRepository>();
             services.AddScoped<IDessertCategoryRepository, DessertCategoryRepository>();
             services.AddScoped<IDessertIngredientRepository, DessertIngredientRepository>();
+            services.AddScoped<IInventoryAnalysisRepository, InventoryAnalysisRepository>();
 
             //Ingredient Repositories
             services.AddScoped<IIngredientRepository, IngredientRepository>();
