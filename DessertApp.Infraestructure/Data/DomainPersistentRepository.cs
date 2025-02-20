@@ -99,17 +99,17 @@ namespace DessertApp.Infraestructure.Data
                 .FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<T?> GetByIdAsync(TKey id, CancellationToken cancellationToken)
-        {
-            return await _dbSet.FindAsync([id], cancellationToken);
-        }
-
-        public async Task<T?> GetByIdWithDetailsAsync(TKey id, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes)
+        public async Task<T?> GetByIdAsync(
+            TKey id,
+            CancellationToken cancellationToken,
+            Func<IQueryable<T>, IQueryable<T>>? include = null)
         {
             IQueryable<T> query = _dbSet;
-            foreach (var include in includes)
+
+            if (include != null)
             {
-                query = query.Include(include);
+                query = include(query);
+
             }
 
             return await query.FirstOrDefaultAsync(entity => EF.Property<TKey>(entity, "Id")!.Equals(id), cancellationToken);

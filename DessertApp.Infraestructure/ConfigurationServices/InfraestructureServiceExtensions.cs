@@ -133,6 +133,9 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             //UnitConversion Repositories
             services.AddScoped<IUnitConversionRepository, UnitConversionRepository>();
 
+            //PurchaseOrder Repositories
+            services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
+
             //UnitOfWork services
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

@@ -118,10 +118,10 @@ namespace DessertApp.Infraestructure.DomainRepositories
         public async Task<bool> DeleteIngredientWhitUnitsAsync(int id, CancellationToken cancellationToken)
         {
             //Get the Ingredient with IngredientUnits
-            var ingredient = await _unitOfWork.Ingredients.GetByIdWithDetailsAsync(
+            var ingredient = await _unitOfWork.Ingredients.GetByIdAsync(
                 id,
                 cancellationToken,
-                ingredient => ingredient.IngredientUnit!
+                query => query.Include(i => i.IngredientUnit)
             );
 
             if (ingredient == null) return false;
@@ -157,10 +157,10 @@ namespace DessertApp.Infraestructure.DomainRepositories
 
         public async Task<Ingredient?> GetIngredientWithUnitsAsync(int id, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.Ingredients.GetByIdWithDetailsAsync(
+            return await _unitOfWork.Ingredients.GetByIdAsync(
                 id,
                 cancellationToken,
-                ingredient => ingredient.IngredientUnit!);
+                query => query.Include(i => i.IngredientUnit));
         }
 
         public async Task<List<IngredientUnitImportDto>> ImportIngredientsFromExternalSourceAsync(Stream source, CancellationToken cancellationToken)
@@ -171,10 +171,10 @@ namespace DessertApp.Infraestructure.DomainRepositories
         public async Task<Ingredient> UpdateIngredientAsync(Ingredient ingredient, IngredientUnit updatedUnit, CancellationToken cancellationToken)
         {
             //Get existing ingredient with their units
-            var existingIngredient = await _unitOfWork.Ingredients.GetByIdWithDetailsAsync(
+            var existingIngredient = await _unitOfWork.Ingredients.GetByIdAsync(
                 ingredient.Id,
                 cancellationToken,
-                i => i.IngredientUnit!
+                query => query.Include(i => i.IngredientUnit)
             ) ?? throw new Exception("Ingredient not found");
 
             //Update main ingredient

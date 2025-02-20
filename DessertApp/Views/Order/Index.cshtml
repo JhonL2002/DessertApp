@@ -1,0 +1,43 @@
+﻿@using DessertApp.Models.Entities
+@model IEnumerable<PurchaseOrder>
+
+@{
+    ViewData["Title"] = "Purchase Orders";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Order ID</th>
+            <th>Total Cost</th>
+            <th>Order Date</th>
+            <th>Expected Delivery Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.TotalCost</td>
+                <td>@order.OrderDate</td>
+                <td>@order.ExpectedDeliveryDate</td>
+                @if (order.IsApproved)
+                {
+                    <td>Approved</td>
+                }
+                else
+                {
+                    <td>Pending</td>
+                }
+                <td>
+                    <a href="@Url.Action("Details","Order", new { orderId = order.Id })" class="btn btn-link btn-sm">Details</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

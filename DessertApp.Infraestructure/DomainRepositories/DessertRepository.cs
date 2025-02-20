@@ -62,7 +62,7 @@ namespace DessertApp.Infraestructure.DessertServices
 
         public async Task<Dessert?> GetDessertWithCategoryAsync(int id, CancellationToken cancellationToken)
         {
-            return await _dessertRepository.GetByIdWithDetailsAsync(id, cancellationToken, c => c.DessertCategory);
+            return await _dessertRepository.GetByIdAsync(id, cancellationToken, query => query.Include(d => d.DessertCategory));
         }
 
         public async Task<Dessert> UpdateDessertAsync(Dessert dessert, CancellationToken cancellationToken)

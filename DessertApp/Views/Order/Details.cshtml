@@ -1,0 +1,66 @@
+﻿@using DessertApp.Models.Entities
+@model PurchaseOrder
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Ingredient</th>
+                <th>Quantity</th>
+                <th>Unit Cost</th>
+                <th>Subtotal</th>
+                <th>Remaining Orders</th>
+                <th>Next Order Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var orderDetail in Model.OrderDetails)
+            {
+                <tr>
+                    <td>@orderDetail.Ingredient.Name</td>
+                    <td>@orderDetail.Quantity @orderDetail.Unit.Name</td>
+                    <td>@orderDetail.UnitCost</td>
+                    <td>@orderDetail.Subtotal</td>
+                    <td>@orderDetail.RemainingOrders</td>
+                    <td>@orderDetail.NextOrderDate</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                @if (Model.IsApproved)
+                {
+                    <td>Approved</td>
+                    <td>
+                        <a href="@Url.Action("Index", "Order")" class="btn btn-primary">Back to List</a>
+                    </td>
+                }
+                else
+                {
+                    <td>Pending</td>
+                    <td>
+                        <a href="@Url.Action("ApproveOrder", "Order", new { orderId = Model.Id })" class="btn btn-primary">Approve</a>
+                    </td>
+                }
+            </tr>
+        </tbody>
+    </table>
+
+</div>
