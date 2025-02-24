@@ -24,6 +24,7 @@ namespace DessertApp.Infraestructure.Data
         public DbSet<IngredientUnit> IngredientUnits { get; set; }
         public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
         public DbSet<PurchaseOrderDetail> PurchaseOrderDetails { get; set; }
+        public DbSet<PendingReplenishment> PendingReplenishments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
