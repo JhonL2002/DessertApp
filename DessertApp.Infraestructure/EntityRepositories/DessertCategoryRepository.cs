@@ -3,7 +3,7 @@ using DessertApp.Models.Entities;
 using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
 using Microsoft.EntityFrameworkCore;
 
-namespace DessertApp.Infraestructure.DomainRepositories
+namespace DessertApp.Infraestructure.EntityRepositories
 {
     public class DessertCategoryRepository : IDessertCategoryRepository
     {

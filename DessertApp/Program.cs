@@ -6,6 +6,10 @@ using Microsoft.EntityFrameworkCore;
 using AspNetCoreRateLimit;
 using DessertApp.Application.DessertServices;
 using DessertApp.Application.ApplicationServicesInjections;
+using Hangfire;
+using DessertApp.Application.InventoryServices;
+using System.Reflection;
+using DessertApp.Application.Features.PurchaseOrders.Commands;
 var builder = WebApplication.CreateBuilder(args);
 
 //Configure the global culture (en-US)
@@ -38,7 +42,7 @@ var logger = new LoggerConfiguration()
 
 //Add extended services from Infraestructure layer
 builder.Services.AddConfigurationServices(builder.Configuration);
-builder.Services.AddExternalServices();
+builder.Services.AddExternalServices(builder.Configuration, environment);
 builder.Services.AddIdentityServices();
 builder.Services.AddDatabaseServices(
     builder.Configuration,
@@ -48,6 +52,8 @@ builder.Services.AddRepositoriesServices();
 
 //Add extended services from Application layer
 builder.Services.AddApplicationServices();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreatePurchaseOrderCommand).Assembly));
 
 
 //Add Serilog as global logger
@@ -77,6 +83,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
     app.UseHttpsRedirection();
 }
+
+//Set Hangfire Dashboard
+app.UseHangfireDashboard("/hangfire");
 
 // Apply rate limiting middleware
 app.UseIpRateLimiting();

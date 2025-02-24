@@ -3,7 +3,7 @@ using DessertApp.Services.Infraestructure.RepositoriesServices.IdentityRepositor
 using DessertApp.Services.Infraestructure.RoleStoreServices;
 using Microsoft.AspNetCore.Identity;
 
-namespace DessertApp.Infraestructure.Repositories
+namespace DessertApp.Infraestructure.InfraestructureRepositories
 {
     public class RoleRepository : IGenericIdentityRepository<AppRole, IdentityResult, string>
     {

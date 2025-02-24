@@ -1,15 +1,13 @@
 ﻿using AspNetCoreRateLimit;
-using DessertApp.Application.MeasurementUnitServices;
 using DessertApp.Infraestructure.AccountServices;
 using DessertApp.Infraestructure.CacheServices;
 using DessertApp.Infraestructure.Data;
 using DessertApp.Infraestructure.DataInitializerServices;
-using DessertApp.Infraestructure.DessertServices;
-using DessertApp.Infraestructure.DomainRepositories;
 using DessertApp.Infraestructure.EmailServices;
+using DessertApp.Infraestructure.EntityRepositories;
 using DessertApp.Infraestructure.IdentityModels;
 using DessertApp.Infraestructure.ImportDataServices;
-using DessertApp.Infraestructure.Repositories;
+using DessertApp.Infraestructure.InfraestructureRepositories;
 using DessertApp.Infraestructure.ResilienceServices;
 using DessertApp.Infraestructure.RoleServices;
 using DessertApp.Infraestructure.SecretServices;
@@ -17,7 +15,6 @@ using DessertApp.Infraestructure.UnitOfWorkServices;
 using DessertApp.Infraestructure.UserServices;
 using DessertApp.Models.Entities;
 using DessertApp.Services.DTOs;
-using DessertApp.Services.IEmailServices;
 using DessertApp.Services.Infraestructure.AccountServices;
 using DessertApp.Services.Infraestructure.CacheServices;
 using DessertApp.Services.Infraestructure.ConfigurationServices;
@@ -31,6 +28,7 @@ using DessertApp.Services.Infraestructure.RoleStoreServices;
 using DessertApp.Services.Infraestructure.SecretServices;
 using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using DessertApp.Services.Infraestructure.UserManagerServices;
+using Hangfire;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -42,6 +40,24 @@ namespace DessertApp.Infraestructure.ConfigurationServices
 {
     public static class InfraestructureServiceExtensions
     {
+        static string connectionString = string.Empty;
+
+        private static string GetConnectionString(IConfiguration configuration, IServiceProvider provider, string environment)
+        {
+            var secretProvider = provider.GetRequiredService<IManageSecrets>();
+            if (environment == "Development")
+            {
+                connectionString = configuration["SQL_CONNECTION_STRING"]!;
+            }
+            else
+            {
+                connectionString = secretProvider
+                    .GetSecretsAsync("dessertkeyvault", "DessertAppSQL")
+                    .GetAwaiter().GetResult();
+            }
+            return connectionString;
+        }
+
         public static IServiceCollection AddDatabaseServices(
             this IServiceCollection services,
             IConfiguration configuration,
@@ -56,16 +72,7 @@ namespace DessertApp.Infraestructure.ConfigurationServices
 
                 try
                 {
-                    if (environment == "Development")
-                    {
-                        connectionString = configuration["SQL_CONNECTION_STRING"]!;
-                    }
-                    else
-                    {
-                        connectionString = secretProvider
-                            .GetSecretsAsync("dessertkeyvault", "DessertAppSQL")
-                            .GetAwaiter().GetResult();
-                    }
+                    connectionString = GetConnectionString(configuration, provider, environment);
 
                     options.UseSqlServer(connectionString, sqlOptions =>
                     {
@@ -135,6 +142,7 @@ namespace DessertApp.Infraestructure.ConfigurationServices
 
             //PurchaseOrder Repositories
             services.AddScoped<IPurchaseOrderRepository, PurchaseOrderRepository>();
+            services.AddScoped<IPendingReplenishmentRepository, PendingReplenishmentRepository>();
 
             //UnitOfWork services
             services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -143,7 +151,7 @@ namespace DessertApp.Infraestructure.ConfigurationServices
         }
 
         //Add external services instead databases (for example, Mailjet and Azure Key Vault)
-        public static IServiceCollection AddExternalServices(this IServiceCollection services)
+        public static IServiceCollection AddExternalServices(this IServiceCollection services, IConfiguration configuration, string environment)
         {
             //Email sender services
             services.AddScoped<IEmailSender, EmailSender>();
@@ -158,6 +166,21 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             //Add external services to work with massive data (Import data from Excel)
             services.AddScoped<IImportData<IngredientUnitImportDto>, ImportIngredient>();
             services.AddScoped<IImportData<DessertAnalysis>, ImportMonthlyDessertDemand>();
+
+            //Add Hangfire services
+            services.AddHangfire(config =>
+                config.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                      .UseSimpleAssemblyNameTypeSerializer()
+                      .UseRecommendedSerializerSettings()
+                      .UseSqlServerStorage(
+                        GetConnectionString(configuration, services.BuildServiceProvider(), environment)
+                      )
+            );
+
+            //Add Background Job services
+            //services.AddScoped<IBackgroundJobService, HangfireBackgroundJobService>();
+
+            services.AddHangfireServer();
 
             return services;
         }

@@ -14,6 +14,8 @@ namespace DessertApp.Infraestructure.UnitOfWorkServices
         private readonly IDomainGenericRepository<DessertIngredient, int> _dessertIngredientRepository;
         private readonly IDomainGenericRepository<InventoryAnalysis, int> _inventoryAnalysisRepository;
         private readonly IDomainGenericRepository<PurchaseOrder, int> _purchaseOrderRepository;
+        private readonly IDomainGenericRepository<UnitConversion, int> _unitConversionRepository;
+        private readonly IDomainGenericRepository<PendingReplenishment, int> _pendingReplenishmentRepository;
 
         public UnitOfWork(
             AppDbContext appDbContext,
@@ -22,7 +24,9 @@ namespace DessertApp.Infraestructure.UnitOfWorkServices
             IDomainGenericRepository<MeasurementUnit, int> measurementUnitRepository,
             IDomainGenericRepository<DessertIngredient, int> dessertIngredientRepository,
             IDomainGenericRepository<InventoryAnalysis, int> inventoryAnalysisRepository,
-            IDomainGenericRepository<PurchaseOrder, int> purchaseOrderRepository)
+            IDomainGenericRepository<PurchaseOrder, int> purchaseOrderRepository,
+            IDomainGenericRepository<UnitConversion, int> unitConversionRepository,
+            IDomainGenericRepository<PendingReplenishment, int> pendingReplenishmentRepository)
         {
             _appDbContext = appDbContext;
             _ingredientRepository = ingredientRepository;
@@ -31,6 +35,8 @@ namespace DessertApp.Infraestructure.UnitOfWorkServices
             _dessertIngredientRepository = dessertIngredientRepository;
             _inventoryAnalysisRepository = inventoryAnalysisRepository;
             _purchaseOrderRepository = purchaseOrderRepository;
+            _unitConversionRepository = unitConversionRepository;
+            _pendingReplenishmentRepository = pendingReplenishmentRepository;
         }
 
         public IDomainGenericRepository<Ingredient, int> Ingredients => _ingredientRepository;
@@ -39,6 +45,8 @@ namespace DessertApp.Infraestructure.UnitOfWorkServices
         public IDomainGenericRepository<DessertIngredient, int> DessertIngredients => _dessertIngredientRepository;
         public IDomainGenericRepository<InventoryAnalysis, int> InventoryAnalysis => _inventoryAnalysisRepository;
         public IDomainGenericRepository<PurchaseOrder, int> PurchaseOrders => _purchaseOrderRepository;
+        public IDomainGenericRepository<UnitConversion, int> UnitConversions => _unitConversionRepository;
+        public IDomainGenericRepository<PendingReplenishment, int> PendingReplenishments => _pendingReplenishmentRepository;
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {

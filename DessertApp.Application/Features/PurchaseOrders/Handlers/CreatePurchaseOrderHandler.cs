@@ -1,46 +1,23 @@
-﻿using DessertApp.Models.Entities;
-using DessertApp.Services.Application.PurchaseOrderServices;
+﻿using DessertApp.Application.Features.PurchaseOrders.Commands;
+using DessertApp.Models.Entities;
 using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
 using DessertApp.Services.Infraestructure.UnitOfWorkServices;
+using MediatR;
 
-namespace DessertApp.Application.PurchaseOrderServices
+namespace DessertApp.Application.Features.PurchaseOrders.Handlers
 {
-    public class PurchaseOrderService : IPurchaseOrderService
+    public class CreatePurchaseOrderHandler : IRequestHandler<CreatePurchaseOrderCommand, bool>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IInventoryAnalysisRepository _inventoryAnalysisRepository;
-        private readonly IPurchaseOrderRepository _purchaseOrderRepository;
 
-        public PurchaseOrderService(IUnitOfWork unitOfWork, IInventoryAnalysisRepository inventoryAnalysisRepository, IPurchaseOrderRepository purchaseOrderRepository)
+        public CreatePurchaseOrderHandler(IUnitOfWork unitOfWork, IInventoryAnalysisRepository inventoryAnalysisRepository)
         {
             _unitOfWork = unitOfWork;
             _inventoryAnalysisRepository = inventoryAnalysisRepository;
-            _purchaseOrderRepository = purchaseOrderRepository;
         }
 
-        public async Task<bool> ApprovePurchaseOrderAsync(int orderId, CancellationToken cancellationToken)
-        {
-            var order = await _unitOfWork.PurchaseOrders.GetByIdAsync(orderId, cancellationToken);
-
-            if (order == null)
-            {
-                return false;
-            }
-
-            if (order.IsApproved)
-            {
-                return false;
-            }
-
-            //Approve the order
-            order.IsApproved = true;
-            await _unitOfWork.PurchaseOrders.UpdateAsync(order, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return true;
-        }
-
-        public async Task CreatePurchaseOrderAsync(CancellationToken cancellationToken)
+        public async Task<bool> Handle(CreatePurchaseOrderCommand request, CancellationToken cancellationToken)
         {
             var analyses = await _inventoryAnalysisRepository.GetInventoryAnalysesWithDetailsAsync(cancellationToken);
             if (!analyses.Any()) throw new Exception("No inventory analysis found");
@@ -86,7 +63,7 @@ namespace DessertApp.Application.PurchaseOrderServices
                     UnitCost = unitCost,
                     Subtotal = subtotal,
                     NextOrderDate = DateTime.Now.AddMonths((int)analysis.OptimalOrderingPeriod),
-                    RemainingOrders = (int)(12/analysis.OrderFrequency)
+                    RemainingOrders = (int)(12 / analysis.OrderFrequency)
                 };
 
                 totalCost += detail.Subtotal;
@@ -98,18 +75,7 @@ namespace DessertApp.Application.PurchaseOrderServices
             await _unitOfWork.PurchaseOrders.AddAsync(purchaseOrder, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        }
-
-        public async Task<IEnumerable<PurchaseOrder>> GetAllOrdersAsync(CancellationToken cancellationToken)
-        {
-            var orders = await _purchaseOrderRepository.GetAllOrdersAsync(cancellationToken);
-            return orders;
-        }
-
-        public async Task<PurchaseOrder?> GetOrderDetailsAsync(int orderId, CancellationToken cancellationToken)
-        {
-            var order = await _purchaseOrderRepository.GetOrderDetailsAsync(orderId, cancellationToken);
-            return order;
+            return true;
         }
     }
 }

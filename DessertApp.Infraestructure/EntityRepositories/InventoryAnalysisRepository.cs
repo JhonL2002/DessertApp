@@ -1,22 +1,22 @@
-﻿using DessertApp.Infraestructure.Data;
-using DessertApp.Models.Entities;
+﻿using DessertApp.Models.Entities;
 using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
+using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using Microsoft.EntityFrameworkCore;
 
-namespace DessertApp.Infraestructure.DomainRepositories
+namespace DessertApp.Infraestructure.EntityRepositories
 {
     public class InventoryAnalysisRepository : IInventoryAnalysisRepository
     {
-        private readonly DomainPersistentRepository<InventoryAnalysis, int> _inventoryAnalysisRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public InventoryAnalysisRepository(DomainPersistentRepository<InventoryAnalysis, int> inventoryAnalysisRepository)
+        public InventoryAnalysisRepository(IUnitOfWork unitOfWork)
         {
-            _inventoryAnalysisRepository = inventoryAnalysisRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public Task<IEnumerable<InventoryAnalysis>> GetInventoryAnalysesWithDetailsAsync(CancellationToken cancellationToken)
         {
-            return _inventoryAnalysisRepository.GetAllWithDetailsAsync(
+            return _unitOfWork.InventoryAnalysis.GetAllWithDetailsAsync(
                 filter: null,
                 cancellationToken: cancellationToken,
                 query => query

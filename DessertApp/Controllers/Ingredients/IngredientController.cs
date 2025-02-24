@@ -1,5 +1,6 @@
 ﻿using DessertApp.Models.Entities;
 using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
 using DessertApp.ViewModels.DomainVM;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -211,7 +212,7 @@ namespace DessertApp.Controllers.Ingredients
                     AnnualDemand = model.IngredientUnitVM.AnnualDemand
                 };
 
-                await _ingredientService.UpdateIngredientAsync(ingredient, updatedUnits, cancellationToken);
+                await _ingredientService.UpdateIngredientWithUnitAsync(ingredient, updatedUnits, cancellationToken);
 
                 return RedirectToAction(nameof(Index));
             }

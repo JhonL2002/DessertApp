@@ -12,6 +12,8 @@ namespace DessertApp.Services.Infraestructure.UnitOfWorkServices
         IDomainGenericRepository<DessertIngredient, int> DessertIngredients { get; }
         IDomainGenericRepository<InventoryAnalysis, int> InventoryAnalysis { get; }
         IDomainGenericRepository<PurchaseOrder, int> PurchaseOrders { get; }
+        IDomainGenericRepository<UnitConversion, int> UnitConversions { get; }
+        IDomainGenericRepository<PendingReplenishment, int> PendingReplenishments { get; }
 
         //Commit changes to database
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);

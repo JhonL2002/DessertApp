@@ -2,7 +2,7 @@
 using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
 using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 
-namespace DessertApp.Application.MeasurementUnitServices
+namespace DessertApp.Infraestructure.EntityRepositories
 {
     public class MeasurementUnitRepository : IMeasurementUnitRepository
     {

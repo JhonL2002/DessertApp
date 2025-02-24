@@ -1,7 +1,7 @@
 ﻿using DessertApp.Models.Entities;
 using DessertApp.Services.DTOs;
 
-namespace DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories
+namespace DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories
 {
     public interface IIngredientRepository
     {
@@ -12,7 +12,7 @@ namespace DessertApp.Services.Infraestructure.RepositoriesServices.DomainReposit
         Task<Ingredient> CreateIngredientAsync(Ingredient ingredient, IngredientUnit ingredientUnit, CancellationToken cancellationToken);
         Task<List<IngredientUnitImportDto>> ImportIngredientsFromExternalSourceAsync(Stream source, CancellationToken cancellationToken);
         Task<List<Ingredient>> CreateIngredientsFromExternalSources(List<IngredientUnitImportDto> ingredientDtos, CancellationToken cancellationToken);
-        Task<Ingredient> UpdateIngredientAsync(Ingredient ingredient, IngredientUnit updatedUnit, CancellationToken cancellationToken);
+        Task<Ingredient> UpdateIngredientWithUnitAsync(Ingredient ingredient, IngredientUnit updatedUnit, CancellationToken cancellationToken);
         Task<bool> DeleteIngredientWhitUnitsAsync(int id, CancellationToken cancellationToken);
     }
 }

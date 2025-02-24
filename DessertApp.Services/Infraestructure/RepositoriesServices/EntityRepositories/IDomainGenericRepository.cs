@@ -10,6 +10,7 @@ namespace DessertApp.Services.Infraestructure.RepositoriesServices.EntityReposit
         void Attach(T entity, CancellationToken cancellationToken);
         Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken);
         Task UpdateAsync(T entity, CancellationToken cancellationToken);
+        Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken);
         Task<T?> GetByFieldAsync(string fieldName, string value, CancellationToken cancellationToken);
         Task DeleteAsync(T entity, CancellationToken cancellationToken, params object[] releatedEntities);
         Task DeleteRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken);

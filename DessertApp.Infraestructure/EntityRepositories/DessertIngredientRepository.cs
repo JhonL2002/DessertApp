@@ -4,7 +4,7 @@ using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositorie
 using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using Microsoft.EntityFrameworkCore;
 
-namespace DessertApp.Infraestructure.DomainRepositories
+namespace DessertApp.Infraestructure.EntityRepositories
 {
     public class DessertIngredientRepository : IDessertIngredientRepository
     {

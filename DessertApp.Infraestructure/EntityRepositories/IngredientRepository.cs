@@ -1,11 +1,11 @@
 ﻿using DessertApp.Models.Entities;
 using DessertApp.Services.DTOs;
 using DessertApp.Services.Infraestructure.ImportDataServices;
-using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
 using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using Microsoft.EntityFrameworkCore;
 
-namespace DessertApp.Infraestructure.DomainRepositories
+namespace DessertApp.Infraestructure.EntityRepositories
 {
     public class IngredientRepository : IIngredientRepository
     {
@@ -168,7 +168,7 @@ namespace DessertApp.Infraestructure.DomainRepositories
             return await _importIngredient.ImportFromExternalSourceAsync(source);
         }
 
-        public async Task<Ingredient> UpdateIngredientAsync(Ingredient ingredient, IngredientUnit updatedUnit, CancellationToken cancellationToken)
+        public async Task<Ingredient> UpdateIngredientWithUnitAsync(Ingredient ingredient, IngredientUnit updatedUnit, CancellationToken cancellationToken)
         {
             //Get existing ingredient with their units
             var existingIngredient = await _unitOfWork.Ingredients.GetByIdAsync(

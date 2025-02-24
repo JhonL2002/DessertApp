@@ -1,10 +1,9 @@
-﻿
-using DessertApp.Services.Infraestructure.EmailServices;
+﻿using DessertApp.Services.Infraestructure.EmailServices;
 using Mailjet.Client;
 using Mailjet.Client.Resources;
 using Newtonsoft.Json.Linq;
 
-namespace DessertApp.Services.IEmailServices
+namespace DessertApp.Infraestructure.EmailServices
 {
     public class MailjetEmailRequestBuilder : IEmailRequestBuilder<MailjetRequest>
     {

@@ -126,5 +126,11 @@ namespace DessertApp.Infraestructure.Data
             _dbSet.Update(entity);
             return Task.CompletedTask;
         }
+
+        public Task UpdateRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken)
+        {
+            _dbSet.UpdateRange(entities);
+            return Task.CompletedTask;
+        }
     }
 }

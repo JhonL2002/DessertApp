@@ -1,15 +1,20 @@
-﻿using DessertApp.Services.Application.PurchaseOrderServices;
+﻿using DessertApp.Application.Features.Inventories.Commands;
+using DessertApp.Application.Features.PurchaseOrders.Commands;
+using DessertApp.Application.Features.PurchaseOrders.Queries;
+using DessertApp.Models.Entities;
+using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DessertApp.Controllers.Productions
 {
     public class OrderController : Controller
     {
-        private readonly IPurchaseOrderService _purchaseOrderService;
+        private readonly IMediator _mediator;
 
-        public OrderController(IPurchaseOrderService purchaseOrderService)
+        public OrderController(IMediator mediator)
         {
-            _purchaseOrderService = purchaseOrderService;
+            _mediator = mediator;
         }
 
         [HttpGet]
@@ -17,7 +22,7 @@ namespace DessertApp.Controllers.Productions
         {
             try
             {
-                await _purchaseOrderService.CreatePurchaseOrderAsync(cancellationToken);
+                await _mediator.Send(new CreatePurchaseOrderCommand(), cancellationToken);
 
                 TempData["SuccessMessage"] = "The first purchase order has been generated successfully";
                 return RedirectToAction("Index", "Home");
@@ -32,28 +37,32 @@ namespace DessertApp.Controllers.Productions
         [HttpGet]
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var orderDetails = await _purchaseOrderService.GetAllOrdersAsync(cancellationToken);
-            return View(orderDetails);
+            var orders = await _mediator.Send(new GetAllOrdersQuery(), cancellationToken);
+            return View(orders);
         }
 
         [HttpGet]
         public async Task<IActionResult> Details(int orderId, CancellationToken cancellationToken)
         {
-            var orderDetails = await _purchaseOrderService.GetOrderDetailsAsync(orderId, cancellationToken);
-            return View(orderDetails);
+            var order = await _mediator.Send(new GetOrderDetailsQuery(orderId), cancellationToken);
+            return order != null ? View(order) : NotFound();
         }
 
         [HttpGet]
         public async Task<IActionResult> ApproveOrder(int orderId, CancellationToken cancellationToken)
         {
-            var isApproved = await _purchaseOrderService.ApprovePurchaseOrderAsync(orderId, cancellationToken);
+            var result = await _mediator.Send(new ApprovePurchaseOrderCommand(orderId), cancellationToken);
 
-            if (isApproved)
+            if (result)
             {
+                var pendingReplenishment = new PendingReplenishment { OrderId = orderId };
+                var repository = HttpContext.RequestServices.GetService<IPendingReplenishmentRepository>();
+                await repository!.AddPendingReplenishmentAsync(pendingReplenishment, cancellationToken);
+
                 return RedirectToAction("Index");
             }
 
-            return View(isApproved);
+            return View(result);
         }
     }
 }
