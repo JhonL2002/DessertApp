@@ -1,6 +1,8 @@
 ﻿using DessertApp.Models.Entities;
 using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
-using DessertApp.ViewModels.DomainVM;
+using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
+using DessertApp.Services.Infraestructure.UnitOfWorkServices;
+using DessertApp.ViewModels.EntitiesVM;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,17 +15,19 @@ namespace DessertApp.Controllers.Desserts
         private readonly IDessertCategoryRepository _dessertCategoryService;
         private readonly IDessertRepository _dessertService;
         private readonly ILogger<DessertController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DessertController(IDessertCategoryRepository dessertCategoryService, IDessertRepository dessertService, ILogger<DessertController> logger)
+        public DessertController(IDessertCategoryRepository dessertCategoryService, IDessertRepository dessertService, ILogger<DessertController> logger, IUnitOfWork unitOfWork)
         {
             _dessertCategoryService = dessertCategoryService;
             _dessertService = dessertService;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IActionResult> Index(CancellationToken cancellationToken)
         {
-            var desserts = await _dessertService.GetAllDessertsAsync(cancellationToken);
+            var desserts = await _unitOfWork.Desserts.GetAllAsync(cancellationToken);
             return View(desserts);
         }
 
@@ -58,14 +62,15 @@ namespace DessertApp.Controllers.Desserts
                 DessertCategoryId = model.SelectedCategory
             };
 
-            await _dessertService.CreateDessertAsync(dessert, cancellationToken);
+            await _unitOfWork.Desserts.AddAsync(dessert, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             return RedirectToAction(nameof(Index));
         }
 
         //GET: Delete a Dessert
         public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            var dessert = await _dessertService.GetDessertByIdAsync(id, cancellationToken);
+            var dessert = await _unitOfWork.Desserts.GetByIdAsync(id, cancellationToken);
             if (dessert == null)
             {
                 return NotFound();
@@ -78,13 +83,14 @@ namespace DessertApp.Controllers.Desserts
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id, CancellationToken cancellationToken)
         {
-            var success = await _dessertService.DeleteDessertAsync(id, cancellationToken);
-            if (!success)
-            {
-                return NotFound();
-            }
+            var dessert = await _unitOfWork.Desserts.GetByIdAsync(id, cancellationToken);
 
-            TempData["SuccessMessage"] = "Category deleted successfully!";
+            if (dessert == null) return NotFound();
+
+            await _unitOfWork.Desserts.DeleteAsync(dessert, cancellationToken);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            TempData["SuccessMessage"] = "Dessert deleted successfully!";
             return RedirectToAction(nameof(Index));
         }
 
@@ -151,7 +157,8 @@ namespace DessertApp.Controllers.Desserts
                     DessertCategoryId = model.SelectedCategory
                 };
 
-                await _dessertService.UpdateDessertAsync(dessert, cancellationToken);
+                await _unitOfWork.Desserts.UpdateAsync(dessert, cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
                 return RedirectToAction(nameof(Index));
             }
             model.DessertCategories = new SelectList(

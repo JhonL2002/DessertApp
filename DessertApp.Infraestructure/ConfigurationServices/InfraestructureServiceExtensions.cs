@@ -28,6 +28,7 @@ using DessertApp.Services.Infraestructure.RoleStoreServices;
 using DessertApp.Services.Infraestructure.SecretServices;
 using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using DessertApp.Services.Infraestructure.UserManagerServices;
+using DessertApp.Services.Results;
 using Hangfire;
 using Mailjet.Client;
 using Microsoft.AspNetCore.Identity;
@@ -164,8 +165,8 @@ namespace DessertApp.Infraestructure.ConfigurationServices
             services.AddTransient<IManageSecrets, ManageSecrets>();
 
             //Add external services to work with massive data (Import data from Excel)
-            services.AddScoped<IImportData<IngredientUnitImportDto>, ImportIngredient>();
-            services.AddScoped<IImportData<DessertAnalysis>, ImportMonthlyDessertDemand>();
+            services.AddScoped<IImportData<IngredientResult>, ImportIngredient>();
+            services.AddScoped<IImportData<DessertDemandResult>, ImportAllDessertDemands>();
 
             //Add Hangfire services
             services.AddHangfire(config =>

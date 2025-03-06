@@ -2,6 +2,7 @@
 using DessertApp.Services.Application.DessertServices;
 using DessertApp.Services.DTOs;
 using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
 using System.ComponentModel.DataAnnotations;
 
 namespace DessertApp.Application.DessertServices

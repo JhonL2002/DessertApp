@@ -1,12 +1,13 @@
 ﻿using ClosedXML.Excel;
 using DessertApp.Services.DTOs;
 using DessertApp.Services.Infraestructure.ImportDataServices;
+using DessertApp.Services.Results;
 
 namespace DessertApp.Infraestructure.ImportDataServices
 {
-    public class ImportIngredient : IImportData<IngredientUnitImportDto>
+    public class ImportIngredient : IImportData<IngredientResult>
     {
-        public async Task<List<IngredientUnitImportDto>> ImportFromExternalSourceAsync(Stream externalSource)
+        public async Task<IngredientResult> ImportFromExternalSourceAsync(Stream externalSource, CancellationToken cancellationToken)
         {
             var dtos = new List<IngredientUnitImportDto>();
 
@@ -32,7 +33,7 @@ namespace DessertApp.Infraestructure.ImportDataServices
                     dtos.Add(dto);
                 }
             }
-            return await Task.FromResult(dtos);
+            return await Task.FromResult(new IngredientResult{ IngredientUnitImportDtos = dtos });
         }
     }
 }

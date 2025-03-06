@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace DessertApp.ViewModels.DomainVM
+namespace DessertApp.ViewModels.EntitiesVM
 {
     public class IngredientEditVM
     {

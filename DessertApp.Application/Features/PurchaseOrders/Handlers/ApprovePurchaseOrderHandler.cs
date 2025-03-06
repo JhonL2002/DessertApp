@@ -1,4 +1,6 @@
 ﻿using DessertApp.Application.Features.PurchaseOrders.Commands;
+using DessertApp.Application.Features.PurchaseOrders.Queries;
+using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
 using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using MediatR;
 
@@ -8,7 +10,7 @@ namespace DessertApp.Application.Features.PurchaseOrders.Handlers
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public ApprovePurchaseOrderHandler(IUnitOfWork unitOfWork)
+        public ApprovePurchaseOrderHandler(IUnitOfWork unitOfWork, IMediator mediator)
         {
             _unitOfWork = unitOfWork;
         }

@@ -17,10 +17,4 @@
     <ProjectReference Include="..\DessertApp.Services\DessertApp.Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Ingredients\Commands\" />
-    <Folder Include="Features\Ingredients\Handlers\" />
-    <Folder Include="Features\Ingredients\Queries\" />
-  </ItemGroup>
-
 </Project>

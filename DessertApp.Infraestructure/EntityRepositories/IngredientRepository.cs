@@ -3,6 +3,7 @@ using DessertApp.Services.DTOs;
 using DessertApp.Services.Infraestructure.ImportDataServices;
 using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
 using DessertApp.Services.Infraestructure.UnitOfWorkServices;
+using DessertApp.Services.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace DessertApp.Infraestructure.EntityRepositories
@@ -10,9 +11,9 @@ namespace DessertApp.Infraestructure.EntityRepositories
     public class IngredientRepository : IIngredientRepository
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IImportData<IngredientUnitImportDto> _importIngredient;
+        private readonly IImportData<IngredientResult> _importIngredient;
 
-        public IngredientRepository(IUnitOfWork unitOfWork, IImportData<IngredientUnitImportDto> importIngredient)
+        public IngredientRepository(IUnitOfWork unitOfWork, IImportData<IngredientResult> importIngredient)
         {
             _unitOfWork = unitOfWork;
             _importIngredient = importIngredient;
@@ -163,9 +164,9 @@ namespace DessertApp.Infraestructure.EntityRepositories
                 query => query.Include(i => i.IngredientUnit));
         }
 
-        public async Task<List<IngredientUnitImportDto>> ImportIngredientsFromExternalSourceAsync(Stream source, CancellationToken cancellationToken)
+        public async Task<IngredientResult> ImportIngredientsFromExternalSourceAsync(Stream source, CancellationToken cancellationToken)
         {
-            return await _importIngredient.ImportFromExternalSourceAsync(source);
+            return await _importIngredient.ImportFromExternalSourceAsync(source, cancellationToken);
         }
 
         public async Task<Ingredient> UpdateIngredientWithUnitAsync(Ingredient ingredient, IngredientUnit updatedUnit, CancellationToken cancellationToken)

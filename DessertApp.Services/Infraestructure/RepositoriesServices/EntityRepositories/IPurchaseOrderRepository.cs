@@ -4,7 +4,6 @@ namespace DessertApp.Services.Infraestructure.RepositoriesServices.EntityReposit
 {
     public interface IPurchaseOrderRepository
     {
-        Task<IEnumerable<PurchaseOrder>> GetAllOrdersAsync(CancellationToken cancellationToken);
-        Task<PurchaseOrder?> GetOrderDetailsAsync(int orderId, CancellationToken cancellationToken);
+        Task<PurchaseOrder?> GetOrderWithDetailsAsync(int orderId, CancellationToken cancellationToken);
     }
 }

@@ -1,54 +1,23 @@
 ﻿using DessertApp.Infraestructure.Data;
 using DessertApp.Models.Entities;
-using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
+using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
+using DessertApp.Services.Infraestructure.UnitOfWorkServices;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DessertApp.Infraestructure.EntityRepositories
 {
     public class DessertRepository : IDessertRepository
     {
-        private readonly DomainPersistentRepository<Dessert, int> _dessertRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DessertRepository(DomainPersistentRepository<Dessert, int> dessertRepository)
+        public DessertRepository(IUnitOfWork unitOfWork)
         {
-            _dessertRepository = dessertRepository;
-        }
-
-        public async Task<Dessert> CreateDessertAsync(Dessert dessert, CancellationToken cancellationToken)
-        {
-            await _dessertRepository.AddAsync(dessert, cancellationToken);
-            await _dessertRepository.SaveChangesAsync(cancellationToken);
-            return dessert;
-        }
-
-        public async Task<bool> DeleteDessertAsync(int id, CancellationToken cancellationToken)
-        {
-            var dessert = await _dessertRepository.GetByIdAsync(id, cancellationToken);
-            if (dessert == null) return false;
-
-            await _dessertRepository.DeleteAsync(dessert, cancellationToken);
-            await _dessertRepository.SaveChangesAsync(cancellationToken);
-            return true;
-        }
-
-        public async Task<IEnumerable<Dessert>> GetAllDessertsAsync(CancellationToken cancellationToken)
-        {
-            return await _dessertRepository.GetAllAsync(cancellationToken);
-        }
-
-        public async Task<Dessert?> GetDessertByIdAsync(int id, CancellationToken cancellationToken)
-        {
-            return await _dessertRepository.GetByIdAsync(id, cancellationToken);
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Dessert>> GetDessertsWithIngredientsAsync(CancellationToken cancellationToken)
         {
-             return await _dessertRepository.GetAllWithDetailsAsync(
+             return await _unitOfWork.Desserts.GetAllWithDetailsAsync(
                 filter: null,
                 cancellationToken: cancellationToken,
                 include: query => query
@@ -62,14 +31,7 @@ namespace DessertApp.Infraestructure.EntityRepositories
 
         public async Task<Dessert?> GetDessertWithCategoryAsync(int id, CancellationToken cancellationToken)
         {
-            return await _dessertRepository.GetByIdAsync(id, cancellationToken, query => query.Include(d => d.DessertCategory));
-        }
-
-        public async Task<Dessert> UpdateDessertAsync(Dessert dessert, CancellationToken cancellationToken)
-        {
-            await _dessertRepository.UpdateAsync(dessert, cancellationToken);
-            await _dessertRepository.SaveChangesAsync(cancellationToken);
-            return dessert;
+            return await _unitOfWork.Desserts.GetByIdAsync(id, cancellationToken, query => query.Include(d => d.DessertCategory));
         }
     }
 

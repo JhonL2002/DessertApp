@@ -2,6 +2,6 @@
 {
     public interface IImportData<T> where T : class
     {
-        Task<List<T>> ImportFromExternalSourceAsync(Stream externalSource);
+        Task<T> ImportFromExternalSourceAsync(Stream externalSource, CancellationToken cancellationToken);
     }
 }

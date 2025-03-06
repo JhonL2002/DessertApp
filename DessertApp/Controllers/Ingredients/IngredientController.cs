@@ -1,7 +1,7 @@
 ﻿using DessertApp.Models.Entities;
 using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
 using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
-using DessertApp.ViewModels.DomainVM;
+using DessertApp.ViewModels.EntitiesVM;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -47,10 +47,10 @@ namespace DessertApp.Controllers.Ingredients
             {
                 //Read file and get data
                 using var stream = file.OpenReadStream();
-                var ingredientDtos = await _ingredientService.ImportIngredientsFromExternalSourceAsync(stream, cancellationToken);
+                var result = await _ingredientService.ImportIngredientsFromExternalSourceAsync(stream, cancellationToken);
 
                 //Create ingredients
-                var ingredients = await _ingredientService.CreateIngredientsFromExternalSources(ingredientDtos, cancellationToken);
+                var ingredients = await _ingredientService.CreateIngredientsFromExternalSources(result.IngredientUnitImportDtos, cancellationToken);
 
                 //Redirect to success view
                 TempData["SuccessMessage"] = $"{ingredients.Count} ingredients added successfully!";

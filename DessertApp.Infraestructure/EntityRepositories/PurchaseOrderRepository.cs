@@ -14,13 +14,7 @@ namespace DessertApp.Infraestructure.EntityRepositories
             _unitOfWork = unitOfWork;
         }
 
-        public Task<IEnumerable<PurchaseOrder>> GetAllOrdersAsync(CancellationToken cancellationToken)
-        {
-            var orders = _unitOfWork.PurchaseOrders.GetAllAsync(cancellationToken);
-            return orders;
-        }
-
-        public Task<PurchaseOrder?> GetOrderDetailsAsync(int orderId, CancellationToken cancellationToken)
+        public Task<PurchaseOrder?> GetOrderWithDetailsAsync(int orderId, CancellationToken cancellationToken)
         {
             var order = _unitOfWork.PurchaseOrders.GetByIdAsync(
                 orderId,

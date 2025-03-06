@@ -1,7 +1,8 @@
 ﻿using DessertApp.Models.Entities;
 using DessertApp.Services.Infraestructure.RepositoriesServices.DomainRepositories;
 using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
-using DessertApp.ViewModels.DomainVM;
+using DessertApp.Services.Infraestructure.UnitOfWorkServices;
+using DessertApp.ViewModels.EntitiesVM;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -13,16 +14,19 @@ namespace DessertApp.Controllers.Desserts
         private readonly IDessertRepository _dessertService;
         private readonly IIngredientRepository _ingredientService;
         private readonly IMeasurementUnitRepository _measurementUnitService;
+        private readonly IUnitOfWork _unitOfWork;
 
         public DessertIngredientController(IDessertIngredientRepository dessertIngredientService,
             IDessertRepository dessertService,
             IIngredientRepository ingredientService,
-            IMeasurementUnitRepository measurementUnitService)
+            IMeasurementUnitRepository measurementUnitService,
+            IUnitOfWork unitOfWork)
         {
             _dessertIngredientService = dessertIngredientService;
             _dessertService = dessertService;
             _ingredientService = ingredientService;
             _measurementUnitService = measurementUnitService;
+            _unitOfWork = unitOfWork;
         }
 
         //GET: List all recipes
@@ -38,7 +42,7 @@ namespace DessertApp.Controllers.Desserts
             var viewmodel = new DessertIngredientVM
             {
                 Ingredients = new SelectList(await _ingredientService.GetAllIngredientsAsync(cancellationToken), "Id", "Name"),
-                Desserts = new SelectList(await _dessertService.GetAllDessertsAsync(cancellationToken), "Id", "Name"),
+                Desserts = new SelectList(await _unitOfWork.Desserts.GetAllAsync(cancellationToken), "Id", "Name"),
                 Units = new SelectList(await _measurementUnitService.GetMeasurementUnitsAsync(cancellationToken), "Id", "Name"),
             };
             return View(new List<DessertIngredientVM> { viewmodel});
@@ -54,7 +58,7 @@ namespace DessertApp.Controllers.Desserts
                 var viewmodel = new DessertIngredientVM
                 {
                     Ingredients = new SelectList(await _ingredientService.GetAllIngredientsAsync(cancellationToken), "Id", "Name"),
-                    Desserts = new SelectList(await _dessertService.GetAllDessertsAsync(cancellationToken), "Id", "Name"),
+                    Desserts = new SelectList(await _unitOfWork.Desserts.GetAllAsync(cancellationToken), "Id", "Name"),
                     Units = new SelectList(await _measurementUnitService.GetMeasurementUnitsAsync(cancellationToken), "Id", "Name")
                 };
                 return View(new List<DessertIngredientVM> { viewmodel });

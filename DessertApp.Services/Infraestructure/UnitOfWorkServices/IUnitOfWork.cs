@@ -9,7 +9,9 @@ namespace DessertApp.Services.Infraestructure.UnitOfWorkServices
         IDomainGenericRepository<Ingredient, int> Ingredients { get; }
         IDomainGenericRepository<IngredientUnit, int> IngredientUnits { get; }
         IDomainGenericRepository<MeasurementUnit, int> MeasurementUnits { get; }
+        IDomainGenericRepository<Dessert, int> Desserts { get; }
         IDomainGenericRepository<DessertIngredient, int> DessertIngredients { get; }
+        IDomainGenericRepository<DessertDemand, int> DessertDemands { get; }
         IDomainGenericRepository<InventoryAnalysis, int> InventoryAnalysis { get; }
         IDomainGenericRepository<PurchaseOrder, int> PurchaseOrders { get; }
         IDomainGenericRepository<UnitConversion, int> UnitConversions { get; }

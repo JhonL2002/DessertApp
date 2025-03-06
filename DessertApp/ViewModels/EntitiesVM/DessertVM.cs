@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
 
-namespace DessertApp.ViewModels.DomainVM
+namespace DessertApp.ViewModels.EntitiesVM
 {
-    public class DessertEditVM
+    public class DessertVM
     {
-        public int Id { get; set; }
-
         [Required]
         [MaxLength(100)]
         public string Name { get; set; } = string.Empty;

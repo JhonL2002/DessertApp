@@ -3,7 +3,7 @@ using DessertApp.Models.Entities;
 using DessertApp.Services.Infraestructure.RepositoriesServices.EntityRepositories;
 using MediatR;
 
-namespace DessertApp.Application.Features.PurchaseOrders.Handlers
+namespace DessertApp.Application.Features.PurchaseOrders.Handlers.QueryHandlers
 {
     public class GetOrderDetailsHandler : IRequestHandler<GetOrderDetailsQuery, PurchaseOrder?>
     {
@@ -16,7 +16,7 @@ namespace DessertApp.Application.Features.PurchaseOrders.Handlers
 
         public async Task<PurchaseOrder?> Handle(GetOrderDetailsQuery request, CancellationToken cancellationToken)
         {
-            return await _purchaseOrderRepository.GetOrderDetailsAsync(request.OrderId, cancellationToken);
+            return await _purchaseOrderRepository.GetOrderWithDetailsAsync(request.OrderId, cancellationToken);
         }
     }
 }

@@ -292,6 +292,16 @@ namespace DessertApp.Infraestructure.Data
                 entity.Property(ia => ia.CostOfMaintainingUnitsInInventory)
                     .HasPrecision(18, 2);
             });
+
+            //DessertDemand
+            builder.Entity<DessertDemand>(entity =>
+            {
+                entity.HasKey(dd => dd.Id);
+
+                entity.HasOne(dd => dd.Dessert)
+                    .WithMany()
+                    .HasForeignKey(dd => dd.DessertId);
+            });
             base.OnModelCreating(builder);
         }
     }
