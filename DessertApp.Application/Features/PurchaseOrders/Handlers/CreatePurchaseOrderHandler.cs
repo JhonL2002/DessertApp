@@ -41,7 +41,8 @@ namespace DessertApp.Application.Features.PurchaseOrders.Handlers
                 var orderFrequency = Math.Round(analysis.OrderFrequency);
 
                 //Calculate NextOrderDate, NextOrderDate cannot be set on Weekend
-                var nextOrderDate = DateTime.Now.AddMonths((int)analysis.OptimalOrderingPeriod);
+                var daysToAdd = analysis.OptimalOrderingPeriod * 30;
+                var nextOrderDate = DateTime.Now.AddDays((double)daysToAdd);
 
                 //Change to Monday if NextOrderDate is Saturday or Sunday
                 if (nextOrderDate.DayOfWeek == DayOfWeek.Saturday)
@@ -62,8 +63,8 @@ namespace DessertApp.Application.Features.PurchaseOrders.Handlers
                     Quantity = eoq,
                     UnitCost = unitCost,
                     Subtotal = subtotal,
-                    NextOrderDate = DateTime.Now.AddMonths((int)analysis.OptimalOrderingPeriod),
-                    RemainingOrders = (int)(12 / analysis.OrderFrequency)
+                    NextOrderDate = nextOrderDate,
+                    RemainingOrders = (int)orderFrequency
                 };
 
                 totalCost += detail.Subtotal;
