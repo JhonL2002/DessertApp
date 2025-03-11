@@ -1,25 +1,441 @@
-html {
-  font-size: 14px;
+/* Fonts */
+:root {
+    --default-font: "Roboto", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --heading-font: "Amatic SC", sans-serif;
+    --nav-font: "Inter", sans-serif;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+/* Global colors */
+:root {
+    --background-color: #ffffff; /* Background color for the entire website, including individual sections */
+    --default-color: #212529; /* Default color used for the majority of the text content across the entire website */
+    --heading-color: #37373f; /* Color for headings, subheadings and title throughout the website */
+    --accent-color: #ce1212; /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
+    --surface-color: #ffffff; /* The surface color is used as a background of boxed elements within sections, such as cards, icon boxes, or other elements that require a visual separation from the global background. */
+    --contrast-color: #ffffff; /* Contrast color for text, ensuring readability against backgrounds of accent, heading, or default colors. */
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Nav Menu Colors - The following variable styles are separated to allow customized options */
+:root {
+    --nav-color: #7f7f90; /* The default color of the main navmenu links */
+    --nav-hover-color: #ce1212; /* Applied to main navmenu links when they are hovered over or active */
+    --nav-mobile-background-color: #ffffff; /* Used as the background color for mobile navigation menu */
+    --nav-dropdown-background-color: #ffffff; /* Used as the background color for dropdown items that appear when hovering over primary navigation items */
+    --nav-dropdown-color: #7f7f90; /* Used for navigation links of the dropdown items in the navigation menu. */
+    --nav-dropdown-hover-color: #ce1212; /* Similar to --nav-hover-color, this color is applied to dropdown navigation links when they are hovered over. */
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+/* Color presets - These classes override global colors when applied to any section or element, providing reuse of the sam color scheme. */
+.light-background {
+    --background-color: #f2f2f2;
+    --surface-color: #ffffff;
 }
+
+.dark-background {
+    --background-color: #1f1f24;
+    --default-color: #ffffff;
+    --heading-color: #ffffff;
+    --surface-color: #37373f;
+    --contrast-color: #ffffff;
+}
+
+/* Smooth scroll */
+:root {
+    scroll-behavior: smooth;
+}
+
+/*--------------------------------------------------------------------
+# General Styling & Shared Classes
+----------------------------------------------------------------------*/
 
 body {
-  margin-bottom: 60px;
+    color: var(--default-color);
+    --background-color: var(--background-color);
+    font-family: var(--default-font);
 }
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+a:hover {
+    color: color-mix(in srgb, var(--accent-color), transparent 25%);
+    text-decoration: none;
+}
+
+h1,h2,h3,h4,h5,h6 {
+    color: var(--heading-color);
+    font-family: var(--heading-font);
+}
+
+/* Global header */
+.header {
+    color: var(--default-color);
+    background-color: var(--background-color);
+    padding: 20px 0;
+    transition: all 0.5s;
+    z-index: 997;
+}
+
+.header .logo {
+    line-height: 1;
+}
+
+.header .logo img {
+    max-height: 36px;
+    margin-right: 8px;
+}
+
+.header .logo h1 {
+    font-size: 30px;
+    margin: 0;
+    font-weight: 700;
+    color: var(--heading-color);
+    font-family: var(--default-font);
+}
+
+.header .logo span {
+    color: var(--accent-color);
+    font-size: 36px;
+}
+
+.header .btn-getstarted,
+.header .btn-getstarted:focus {
+    color: var(--contrast-color);
+    background-color: var(--accent-color);
+    font-size: 14px;
+    padding: 8px 26px;
+    margin: 0;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.header .btn-getstarted:hover,
+.header .btn-getstarted:focus:hover {
+    color: var(--contrast-color);
+    background: color-mix(in srgb, var(--accent-color), transparent 15%);
+}
+
+@media (max-width: 1200px) {
+    .header .logo {
+        order: 1;
+    }
+
+    .header .btn-getstarted {
+        order: 2;
+        margin: 0 15px 0 0;
+        padding: 6px 20px;
+    }
+
+    .header .navmenu {
+        order: 3;
+    }
+}
+
+.scrolled .header {
+    box-shadow: 0px 0 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Navigation Menu */
+/* Desktop Navigation */
+@media (min-width: 1200px) {
+    .navmenu {
+        padding: 0;
+    }
+
+        .navmenu ul {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+
+        .navmenu li {
+            position: relative;
+        }
+
+        .navmenu > ul > li {
+            white-space: nowrap;
+            padding: 15px 14px;
+        }
+
+            .navmenu>ul>li:last-child {
+                padding-right: 0;
+            }
+
+        .navmenu a,
+        .navmenu a:focus {
+            color: var(--nav-color);
+            font-size: 15px;
+            padding: 0 2px;
+            font-family: var(--nav-font);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            white-space: nowrap;
+            transition: 0.3s;
+            position: relative;
+        }
+
+            .navmenu a i,
+            .navmenu a:focus i {
+                font-size: 12px;
+                line-height: 0;
+                margin-left: 5px;
+                transition: 0.3s;
+            }
+
+        .navmenu>ul>li>a:before {
+            content: "";
+            position: absolute;
+            height: 2px;
+            bottom: -6px;
+            left: 0;
+            background-color: var(--nav-hover-color);
+            visibility: hidden;
+            width: 0px;
+            transition: all 0.3s ease-in-out 0s;
+        }
+
+        .navmenu a:hover:before,
+        .navmenu li:hover > a:before,
+        .navmenu .active:before {
+            visibility: visible;
+            width: 100%;
+        }
+
+        .navmenu li:hover>a,
+        .navmenu .active,
+        .navmenu .active:focus {
+            color: color-mix(in srgb, var(--nav-color) 80%, black 50%);
+        }
+
+        .navmenu .dropdown ul {
+            margin: 0;
+            padding: 10px 0;
+            background: var(--nav-dropdown-background-color);
+            display: block;
+            position: absolute;
+            visibility: hidden;
+            left: 14px;
+            top: 130%;
+            opacity: 0;
+            transition: 0.3s;
+            border-radius: 4px;
+            z-index: 99;
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.1);
+        }
+
+            .navmenu .dropdown ul li {
+                min-width: 200px;
+            }
+
+            .navmenu .dropdown ul a {
+                padding: 10px 20px;
+                font-size: 15px;
+                text-transform: none;
+                color: var(--nav-dropdown-color);
+            }
+
+                .navmenu .dropdown ul a i {
+                    font-size: 12px;
+                }
+
+                .navmenu .dropdown ul a:hover,
+                .navmenu .dropdown ul .active:hover,
+                .navmenu .dropdown ul li:hover > a {
+                    color: var(--nav-dropdown-hover-color);
+                }
+
+        .navmenu .dropdown:hover > ul {
+            opacity: 1;
+            top: 100%;
+            visibility: visible;
+        }
+
+        .navmenu .dropdown .dropdown ul {
+            top: 0;
+            left: -90%;
+            visibility: hidden;
+        }
+
+        .navmenu .dropdown .dropdown:hover > ul {
+            opacity: 1;
+            top: 0;
+            left: -100%;
+            visibility: visible;
+        }
+}
+
+/* Mobile Navigation */
+@media (max-width: 1199px) {
+    .mobile-nav-toggle {
+        display: block;
+        color: var(--nav-color);
+        font-size: 28px;
+        line-height: 0;
+        margin-right: 10px;
+        cursor: pointer;
+        transition: color 0.3s;
+    }
+
+    .navmenu {
+        padding: 0;
+        z-index: 9997;
+    }
+
+        .navmenu ul {
+            display: none;
+            list-style: none;
+            position: absolute;
+            inset: 60px 20px 20px 20px;
+            padding: 10px 0;
+            margin: 0;
+            border-radius: 6px;
+            background-color: var(--nav-mobile-background-color);
+            border: 1px solid color-mix(in srgb, var(--default-color), transparent 90%);
+            box-shadow: none;
+            overflow-y: auto;
+            transition: 0.3s;
+            z-index: 9998;
+        }
+
+        .navmenu a,
+        .navmenu a:focus {
+            color: var(--nav-dropdown-color);
+            padding: 10px 20px;
+            font-family: var(--nav-font);
+            font-size: 17px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+
+            .navmenu a i,
+            .navmenu a:focus i {
+                font-size: 12px;
+                line-height: 0;
+                margin-left: 5px;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                transition: 0.3s;
+                background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+            }
+
+                .navmenu a i:hover,
+                .navmenu a:focus i:hover {
+                    background-color: var(--accent-color);
+                    color: var(--contrast-color);
+                }
+
+            .navmenu a:hover,
+            .navmenu .active,
+            .navmenu .active:focus {
+                color: var(--nav-dropdown-hover-color);
+            }
+
+                .navmenu .active i,
+                .navmenu .active:focus i {
+                    background-color: var(--accent-color);
+                    color: var(--contrast-color);
+                    transform: rotate(180deg);
+                }
+
+        .navmenu .dropdown ul {
+            position: static;
+            display: none;
+            z-index: 99;
+            padding: 10px 0;
+            margin: 10px 20px;
+            background-color: var(--nav-dropdown-background-color);
+            transition: all 0.5s ease-in-out;
+        }
+
+            .navmenu .dropdown ul ul {
+                background-color: rgba(33, 37, 41, 0.1);
+            }
+
+        .navmenu .dropdown>.dropdown-active {
+            display: block;
+            background-color: rgba(33, 37, 41, 0.03);
+        }
+
+    .mobile-nav-active {
+        overflow: hidden;
+    }
+
+        .mobile-nav-active .mobile-nav-toggle {
+            color: #fff;
+            position: absolute;
+            font-size: 32px;
+            top: 15px;
+            right: 15px;
+            margin-right: 0;
+            z-index: 9999;
+        }
+
+        .mobile-nav-active .navmenu {
+            position: fixed;
+            overflow: hidden;
+            inset: 0;
+            background: rgba(33, 37, 41, 0.8);
+            transition: 0.3s;
+        }
+
+            .mobile-nav-active .navmenu>ul {
+                display: block;
+            }
+}
+
+/*-------------------------------------------------------------------
+    # Global Page Title &
+*---------------------------------------------------------------------*/
+.page-title {
+    background-color: color-mix(in srgb, var(--default-color), transparent 96%);
+    color: var(--default-color);
+    background-color: var(--background-color);
+    padding: 120px 0;
+    text-align: center;
+    position: relative;
+}
+
+.page-title h1{
+    font-size: 42px;
+    font-weight: 400;
+    margin-bottom: 10px;
+    font-family: var(--default-font);
+}
+
+.page-title .welcome {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    opacity: 0.8;
+}
+
+.page-title .btn{
+    background: var(--accent-color);
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out;
+}
+
+.page-title .btn:hover{
+    background: #e65c50;
+}
+
 
 .alert {
     transition: opacity 1s ease-out;
@@ -36,4 +452,8 @@ body {
 .fade-out {
     opacity: 0;
     transition: opacity 0.5s;
+}
+
+.grid {
+    display: flex;
 }

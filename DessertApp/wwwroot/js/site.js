@@ -11,62 +11,57 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 8000);
 });
 
-//Logic for...
-document.addEventListener("DOMContentLoaded", function () {
-    let container = document.getElementById("ingredients-container");
-    let addIngredientBtn = document.getElementById("add-ingredient");
-    let dessertSelector = document.getElementById("dessert-selector");
-    let ingredientTemplate = document.getElementById("ingredient-template").content;
 
-    // Obtener valores iniciales de los ingredientes y unidades
-    let ingredientOptions = document.querySelector("[name='models[0].IngredientId']").innerHTML;
-    let unitOptions = document.querySelector("[name='models[0].UnitId']").innerHTML;
+(function () {
+    "use strict";
 
-    addIngredientBtn?.addEventListener("click", function () {
-        let index = document.querySelectorAll(".ingredient-group").length;
-        let newIngredient = document.importNode(ingredientTemplate, true);
-        let ingredientDiv = newIngredient.querySelector(".ingredient-group");
+    /**
+     * Apply .scrolled class to the body as the page is scrolled down
+     */
+    function toggleScrolled() {
+        const selectBody = document.querySelector('body');
+        const selectHeader = document.querySelector('#header');
+        if (!selectHeader.classList.contains('scroll-up-sticky') && !selectHeader.classList.contains('sticky-top') && !selectHeader.classList.contains('fixed-top')) return;
+        window.scrollY > 100 ? selectBody.classList.add('scrolled') : selectBody.classList.remove('scrolled');
+    }
 
-        // Configurar el postre seleccionado automáticamente
-        let dessertSelect = newIngredient.querySelector(".dessert-select");
-        let hiddenDessertInput = newIngredient.querySelector(".hidden-dessert");
-        dessertSelect.innerHTML = dessertSelector.innerHTML; // Copiar las opciones
-        dessertSelect.value = dessertSelector.value; // Fijar el valor actual
-        hiddenDessertInput.name = `models[${index}].DessertId`;
-        hiddenDessertInput.value = dessertSelector.value;
+    document.addEventListener('scroll', toggleScrolled);
+    window.addEventListener('load', toggleScrolled);
 
-        // Configurar los demás campos con nombres dinámicos
-        newIngredient.querySelector(".ingredient-select").name = `models[${index}].IngredientId`;
-        newIngredient.querySelector(".ingredient-select").innerHTML = ingredientOptions;
+    /**
+     * Mobile nav toggle
+     */
+    const mobileNavToggleBtn = document.querySelector('.mobile-nav-toggle');
 
-        newIngredient.querySelector(".quantity-input").name = `models[${index}].QuantityRequired`;
+    function mobileNavToogle() {
+        document.querySelector('body').classList.toggle('mobile-nav-active');
+        mobileNavToggleBtn.classList.toggle('bi-list');
+        mobileNavToggleBtn.classList.toggle('bi-x');
+    }
+    mobileNavToggleBtn.addEventListener('click', mobileNavToogle);
 
-        newIngredient.querySelector(".unit-select").name = `models[${index}].UnitId`;
-        newIngredient.querySelector(".unit-select").innerHTML = unitOptions;
-
-        // Agregar evento para eliminar ingrediente
-        newIngredient.querySelector(".remove-ingredient").addEventListener("click", function () {
-            ingredientDiv.classList.add("fade-out");
-            setTimeout(() => ingredientDiv.remove(), 500); // Se remueve después de la animación
+    /**
+     * Hide mobile nav on same-page/hash links
+     */
+    document.querySelectorAll('#navmenu a').forEach(navmenu => {
+        navmenu.addEventListener('click', () => {
+            if (document.querySelector('.mobile-nav-active')) {
+                mobileNavToogle();
+            }
         });
 
-        // Agregar el nuevo ingrediente al formulario
-        container.appendChild(newIngredient);
-
-        // **Animación para resaltar el nuevo formulario**
-        ingredientDiv.classList.add("highlight");
-        setTimeout(() => ingredientDiv.classList.remove("highlight"), 1500);
     });
 
-    // Actualizar los ingredientes nuevos si el usuario cambia el postre en el formulario original
-    dessertSelector.addEventListener("change", function () {
-        document.querySelectorAll(".dessert-select").forEach(select => {
-            select.value = dessertSelector.value;
-        });
-        document.querySelectorAll(".hidden-dessert").forEach(input => {
-            input.value = dessertSelector.value;
+    /**
+     * Toggle mobile nav dropdowns
+     */
+    document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
+        navmenu.addEventListener('click', function (e) {
+            e.preventDefault();
+            this.parentNode.classList.toggle('active');
+            this.parentNode.nextElementSibling.classList.toggle('dropdown-active');
+            e.stopImmediatePropagation();
         });
     });
-});
-
+})();
 
